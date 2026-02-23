@@ -1,72 +1,72 @@
 """RAG evaluation: faithfulness, relevance; retry & self-correction loop."""
-from openai import OpenAI
-from config import OPENAI_API_KEY, LLM_MODEL, MAX_RETRIES
-
-_client: OpenAI | None = None
+from config import LLM_MODEL, MAX_RETRIES
+from .providers import LLMProvider, make_llm_provider
 
 
-def _client_or_raise() -> OpenAI:
-    global _client
-    if _client is None:
-        if not OPENAI_API_KEY:
-            raise RuntimeError("OPENAI_API_KEY not set")
-        _client = OpenAI(api_key=OPENAI_API_KEY)
-    return _client
-
-
-def score_faithfulness(answer: str, context: str) -> float:
+def score_faithfulness(
+    answer: str,
+    context: str,
+    *,
+    llm: LLMProvider | None = None,
+    llm_model: str | None = None,
+) -> float:
     """Score 0–1: is the answer grounded in context?"""
     if not context.strip():
         return 1.0
-    client = _client_or_raise()
+    llm = llm or make_llm_provider("openai")
     try:
-        r = client.chat.completions.create(
-            model=LLM_MODEL,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "Rate how much the ANSWER is supported by the CONTEXT (no invented facts). "
-                               "Reply with a single number from 0 to 1 (1 = fully supported). Only output the number.",
-                },
-                {"role": "user", "content": f"CONTEXT:\n{context[:3000]}\n\nANSWER:\n{answer[:1500]}"},
-            ],
+        text = llm.generate(
+            system=(
+                "Rate how much the ANSWER is supported by the CONTEXT (no invented facts). "
+                "Reply with a single number from 0 to 1 (1 = fully supported). Only output the number."
+            ),
+            user=f"CONTEXT:\n{context[:3000]}\n\nANSWER:\n{answer[:1500]}",
+            model=llm_model or LLM_MODEL,
             temperature=0,
             max_tokens=10,
-        )
-        text = (r.choices[0].message.content or "1").strip()
+        ).strip()
         return float(text.replace(",", ".").strip() or "1")
     except (ValueError, Exception):
         return 1.0
 
 
-def score_relevance(answer: str, query: str) -> float:
+def score_relevance(
+    answer: str,
+    query: str,
+    *,
+    llm: LLMProvider | None = None,
+    llm_model: str | None = None,
+) -> float:
     """Score 0–1: does the answer address the query?"""
-    client = _client_or_raise()
+    llm = llm or make_llm_provider("openai")
     try:
-        r = client.chat.completions.create(
-            model=LLM_MODEL,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "Rate how well the ANSWER addresses the QUESTION (0 = not at all, 1 = fully). "
-                               "Reply with a single number from 0 to 1. Only output the number.",
-                },
-                {"role": "user", "content": f"QUESTION: {query}\n\nANSWER: {answer}"},
-            ],
+        text = llm.generate(
+            system=(
+                "Rate how well the ANSWER addresses the QUESTION (0 = not at all, 1 = fully). "
+                "Reply with a single number from 0 to 1. Only output the number."
+            ),
+            user=f"QUESTION: {query}\n\nANSWER: {answer}",
+            model=llm_model or LLM_MODEL,
             temperature=0,
             max_tokens=10,
-        )
-        text = (r.choices[0].message.content or "1").strip()
+        ).strip()
         return float(text.replace(",", ".").strip() or "1")
     except (ValueError, Exception):
         return 1.0
 
 
-def evaluate_rag(query: str, answer: str, context: str) -> dict:
+def evaluate_rag(
+    query: str,
+    answer: str,
+    context: str,
+    *,
+    llm: LLMProvider | None = None,
+    llm_model: str | None = None,
+) -> dict:
     """Offline-style evaluation: faithfulness + relevance."""
     return {
-        "faithfulness": score_faithfulness(answer, context),
-        "relevance": score_relevance(answer, query),
+        "faithfulness": score_faithfulness(answer, context, llm=llm, llm_model=llm_model),
+        "relevance": score_relevance(answer, query, llm=llm, llm_model=llm_model),
     }
 
 
@@ -80,28 +80,26 @@ def self_correct(
     initial_answer: str,
     context: str,
     feedback: str = "The answer may not be fully grounded or relevant. Revise using only the context.",
+    *,
+    llm: LLMProvider | None = None,
+    llm_model: str | None = None,
 ) -> str:
     """One self-correction pass: ask LLM to revise answer given feedback."""
-    client = _client_or_raise()
+    llm = llm or make_llm_provider("openai")
     try:
-        r = client.chat.completions.create(
-            model=LLM_MODEL,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "Revise the given ANSWER to better match the CONTEXT and the QUESTION. "
-                               "Output only the revised answer, no meta-commentary.",
-                },
-                {
-                    "role": "user",
-                    "content": f"CONTEXT:\n{context[:3500]}\n\nQUESTION: {query}\n\n"
-                               f"CURRENT ANSWER: {initial_answer}\n\nFEEDBACK: {feedback}",
-                },
-            ],
+        return llm.generate(
+            system=(
+                "Revise the given ANSWER to better match the CONTEXT and the QUESTION. "
+                "Output only the revised answer, no meta-commentary."
+            ),
+            user=(
+                f"CONTEXT:\n{context[:3500]}\n\nQUESTION: {query}\n\n"
+                f"CURRENT ANSWER: {initial_answer}\n\nFEEDBACK: {feedback}"
+            ),
+            model=llm_model or LLM_MODEL,
             temperature=0.1,
             max_tokens=1024,
-        )
-        return (r.choices[0].message.content or initial_answer).strip()
+        ).strip()
     except Exception:
         return initial_answer
 

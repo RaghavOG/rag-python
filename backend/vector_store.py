@@ -6,13 +6,14 @@ import chromadb
 from chromadb.config import Settings
 
 from config import CHROMA_PERSIST_DIR
-from .embeddings import embed_texts
+from .providers import EmbeddingProvider
 
 COLLECTION_NAME = "rag_docs"
-_chroma_client: chromadb.PersistentClient | None = None
+# chromadb.PersistentClient is a factory function (not a type), so avoid using it in annotations.
+_chroma_client: Any | None = None
 
 
-def _get_client() -> chromadb.PersistentClient:
+def _get_client() -> Any:
     global _chroma_client
     if _chroma_client is None:
         p = Path(CHROMA_PERSIST_DIR)
@@ -32,10 +33,16 @@ def ingest_chunks(
     ids: list[str],
     texts: list[str],
     metadatas: list[dict[str, Any]],
+    *,
+    embeddings: list[list[float]] | None = None,
+    embedder: EmbeddingProvider | None = None,
     embed_model: str | None = None,
 ) -> None:
-    """Embed chunks and add to Chroma."""
-    embeddings = embed_texts(texts, model=embed_model)
+    """Add chunks to Chroma (embeddings required, or provide an embedder)."""
+    if embeddings is None:
+        if not embedder:
+            raise RuntimeError("ingest_chunks requires `embeddings=` or `embedder=`")
+        embeddings = embedder.embed(texts, model=embed_model)
     coll = get_collection()
     clean_metas = []
     for m in metadatas:

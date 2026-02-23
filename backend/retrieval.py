@@ -1,20 +1,24 @@
 """Retrieval: multi-query retrieval + reranking."""
 from typing import Any
 
-from .embeddings import embed_single
 from .vector_store import retrieve as chroma_retrieve
 from .query_rewriting import rewrite_for_retrieval
 from .reranker import rerank_with_metadata
+from .providers import EmbeddingProvider, LLMProvider
 from config import TOP_K_RETRIEVE, TOP_K_RERANK, MULTI_QUERY_N
 
 
 def retrieve(
     query: str,
     *,
+    embedder: EmbeddingProvider,
+    embedding_model: str | None = None,
     multi_query: bool = True,
     n_queries: int | None = None,
     top_k_retrieve: int | None = None,
     top_k_rerank: int | None = None,
+    llm: LLMProvider | None = None,
+    llm_model: str | None = None,
 ) -> list[tuple[str, dict[str, Any], float]]:
     """
     Multi-query retrieval + reranking.
@@ -26,14 +30,14 @@ def retrieve(
 
     queries = [query]
     if multi_query and n_queries > 1:
-        rewritten = rewrite_for_retrieval(query, n_queries=n_queries)
+        rewritten = rewrite_for_retrieval(query, n_queries=n_queries, llm=llm, llm_model=llm_model)
         if rewritten:
             queries = rewritten
 
     seen_docs: set[str] = set()
     all_candidates: list[tuple[str, dict, float]] = []
     for q in queries:
-        emb = embed_single(q)
+        emb = embedder.embed([q], model=embedding_model)[0]
         hits = chroma_retrieve(emb, top_k=top_k_retrieve)
         for doc, meta, dist in hits:
             key = (doc[:200], meta.get("source", ""))

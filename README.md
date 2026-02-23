@@ -1,43 +1,119 @@
 ## complete-basic-rag
 
-A **modular Retrieval-Augmented Generation (RAG)** backend using **OpenAI** for LLM + embeddings and **ChromaDB** for vector search, designed to be extended later with a separate frontend (web UI, dashboard, etc.).
+A **packaged, modular RAG toolkit** with:
 
-### Backend (current)
+- **Query understanding / rewriting**
+- **Multi-query retrieval**
+- **Reranking**
+- **LLM generation**
+- **Guardrails** (prompt injection + groundedness)
+- **Evaluation + retry/self-correction**
+- **Pluggable LLM providers**: OpenAI, Azure OpenAI, Anthropic, Gemini, Ollama
 
-- **Tech**: Python, OpenAI API, ChromaDB, sentence-transformers reranker.
-- **Pipeline**:
-  - **Documents**: `document_loaders.py` → `cleaning.py` → `chunking.py` → `embeddings.py` → `vector_store.py`
-  - **Query**: `query_rewriting.py` → `retrieval.py` (+ `reranker.py`)
-  - **Generation**: `generation.py` with **guardrails** in `guardrails.py`
-  - **Eval / Retry**: `evaluation.py` + orchestration in `rag_pipeline.py`
-  - **CLI entrypoint**: `main.py`
+### Install
 
-#### Setup
-
-1. **Install dependencies** (recommended: inside a virtualenv):
+For local dev:
 
 ```bash
-cd complete-basic-rag
 pip install -r requirements.txt
 ```
 
-2. **Configure OpenAI**:
-
-- Copy `.env.example` → `.env`
-- Fill in `OPENAI_API_KEY`.
-
-3. **Ingest documents** (a sample doc is in `data/sample.txt`):
+Or install as a package (editable):
 
 ```bash
-python main.py ingest --reindex --strategy recursive
+pip install -e .
 ```
 
-4. **Ask questions**:
+Optional provider extras:
 
 ```bash
-python main.py query "How many days of annual leave?"
-python main.py chat          # interactive mode
-python main.py chat -v       # with scores & sources
+pip install -e ".[anthropic]"
+pip install -e ".[gemini]"
+```
+
+### Quickstart (Python API)
+
+```python
+from complete_basic_rag import RAG
+
+rag = RAG(
+    llm_provider="openai",
+    llm_model="gpt-4o-mini",
+    embedding_provider="openai",
+    embedding_model="text-embedding-3-small",
+)
+
+rag.ingest(["./data"], reindex=True)
+ans = rag.query("How many days of annual leave?")
+print(ans.text)
+```
+
+### Quickstart (CLI)
+
+After `pip install -e .` you get a console script:
+
+```bash
+complete-basic-rag ingest ./data --reindex
+complete-basic-rag query "How many days of annual leave?"
+```
+
+### Providers
+
+You can mix-and-match **LLM provider** and **embedding provider**.
+
+- **OpenAI (default)**:
+  - Env: `OPENAI_API_KEY`
+  - Example:
+
+```python
+rag = RAG(llm_provider="openai", llm_model="gpt-4o-mini", embedding_provider="openai", embedding_model="text-embedding-3-small")
+```
+
+- **Azure OpenAI** (model = deployment name):
+  - Env: `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `OPENAI_API_VERSION`
+  - Example:
+
+```python
+rag = RAG(
+  llm_provider="azure_openai",
+  llm_model="my-gpt-deployment",
+  embedding_provider="azure_openai",
+  embedding_model="my-embed-deployment",
+)
+```
+
+- **Anthropic (Claude)** (embeddings still need OpenAI/Azure/Ollama):
+
+```python
+rag = RAG(
+  llm_provider="anthropic",
+  llm_model="claude-opus-4-6",
+  embedding_provider="openai",
+  embedding_model="text-embedding-3-small",
+)
+```
+
+- **Gemini** (embeddings still need OpenAI/Azure/Ollama):
+
+```python
+rag = RAG(
+  llm_provider="gemini",
+  llm_model="gemini-2.0-flash",
+  embedding_provider="openai",
+  embedding_model="text-embedding-3-small",
+)
+```
+
+- **Ollama (local)**:
+  - Needs Ollama running (default `http://localhost:11434`)
+
+```python
+rag = RAG(
+  llm_provider="ollama",
+  llm_model="llama3.1",
+  embedding_provider="ollama",
+  embedding_model="mxbai-embed-large",
+)
 ```
 
 ### Frontend (later)
@@ -52,31 +128,28 @@ When you add a frontend, you can:
 - Put its source under `frontend/` (with its own `package.json`, build tooling, etc.).
 - Optionally expose the backend via a REST/GraphQL API or websocket layer on top of the existing RAG pipeline.
 
-### Repo structure
+### Repo structure (high level)
 
 ```text
 .
 ├─ main.py                 # CLI entrypoint (backend)
 ├─ config.py               # Settings / env
-├─ rag_pipeline.py         # Orchestrates full RAG flow
-├─ document_loaders.py     # Document loaders
-├─ cleaning.py             # Cleaning / normalization
-├─ chunking.py             # Chunking strategies
-├─ embeddings.py           # OpenAI embeddings
-├─ vector_store.py         # ChromaDB vector store
-├─ query_rewriting.py      # Query understanding & multi-query
-├─ retrieval.py            # Retrieval + reranking glue
-├─ reranker.py             # Cross-encoder reranker
-├─ generation.py           # LLM generation
-├─ guardrails.py           # Input/output guardrails
-├─ evaluation.py           # RAG evaluation & retry
+├─ complete_basic_rag/      # Public Python package API + CLI
+├─ backend/                 # Implementation (RAG pipeline + providers)
+│  └─ providers/            # OpenAI / Azure / Anthropic / Gemini / Ollama
 ├─ data/
 │  └─ sample.txt           # Example document
 ├─ frontend/               # (empty for now) future UI
 ├─ requirements.txt
+├─ pyproject.toml           # Packaging config
 ├─ .env.example
 └─ .gitignore
 ```
+
+### Docs
+
+- `docs/USAGE.md`
+- `docs/PROVIDERS.md`
 
 ### Git & GitHub
 

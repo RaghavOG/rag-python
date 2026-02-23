@@ -19,3 +19,6 @@ torch>=2.0.0
 
 # Config & CLI
 python-dotenv>=1.0.0
+
+# Ollama HTTP client / general HTTP
+requests>=2.31.0
