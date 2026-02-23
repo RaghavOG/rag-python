@@ -1,0 +1,104 @@
+# Python
+__pycache__/
+*.py[codz]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.pixi/
+__pypackages__/
+
+# Packaging / build
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Unit test / coverage
+.pytest_cache/
+.tox/
+.nox/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.py.cover
+.hypothesis/
+
+# Type checking / tools
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+
+# Logs
+*.log
+
+# Project-specific (RAG)
+chroma_db/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+.pypirc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDEs / editors
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+!*.code-workspace
+*.vsix
+
+# Node / frontend (future)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+.npm/
+.pnpm-store/
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.eslintcache
+.stylelintcache
+.parcel-cache
+.cache
+.vite/
+.next/
+out/
+dist/
+.nuxt/
+.output/
+.svelte-kit/
+.docusaurus/
+
+# OS / misc
+.DS_Store
+Thumbs.db
+

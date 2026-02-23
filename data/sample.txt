@@ -1,0 +1,13 @@
+# Company Policy Document
+
+## Leave Policy
+
+Employees are entitled to 22 days of annual leave per year. Leave requests must be submitted at least two weeks in advance through the HR portal. Unused leave can be carried forward to the next year, subject to a maximum of 5 days.
+
+## Remote Work
+
+Remote work is allowed up to 3 days per week with manager approval. Core hours are 10 AM to 3 PM IST. All team members must be reachable on Slack during core hours.
+
+## Code of Conduct
+
+We expect all employees to treat each other with respect. Harassment and discrimination are not tolerated. Report any concerns to HR or through the anonymous hotline.
