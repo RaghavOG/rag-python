@@ -1,8 +1,8 @@
-"""RAGKit — production-grade modular RAG for Python.
+"""MiniRAG — lightweight production-grade RAG for Python.
 
 Quick start::
 
-    from ragkit import RAG
+    from minirag import RAG
 
     rag = RAG(llm_model="gpt-4o-mini")
     rag.ingest(["./docs"], reindex=True)

@@ -15,8 +15,8 @@ LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 
 # Paths — default to current working directory (works when installed from PyPI)
 PROJECT_ROOT = Path.cwd()
-DATA_DIR = Path(os.getenv("RAGKIT_DATA_DIR", PROJECT_ROOT / "data"))
-CHROMA_PERSIST_DIR = Path(os.getenv("RAGKIT_CHROMA_DIR", PROJECT_ROOT / "chroma_db"))
+DATA_DIR = Path(os.getenv("MINIRAG_DATA_DIR", PROJECT_ROOT / "data"))
+CHROMA_PERSIST_DIR = Path(os.getenv("MINIRAG_CHROMA_DIR", PROJECT_ROOT / "chroma_db"))
 
 # Chunking
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "512"))
@@ -32,6 +32,6 @@ MULTI_QUERY_N = int(os.getenv("MULTI_QUERY_N", "3"))
 GUARDRAILS_ENABLED = os.getenv("GUARDRAILS_ENABLED", "true").lower() == "true"
 MAX_RETRIES = int(os.getenv("MAX_RETRIES", "2"))
 
-# Reranker (optional extra: pip install ragkit[rerank])
+# Reranker (optional extra: pip install minirag[rerank])
 RERANKER_MODEL = os.getenv("RERANKER_MODEL", "BAAI/bge-reranker-base")
 RERANK_ENABLED = os.getenv("RERANK_ENABLED", "true").lower() == "true"

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ragkit.config import (
+from minirag.config import (
     CHUNK_STRATEGY,
     DATA_DIR,
     CHROMA_PERSIST_DIR,

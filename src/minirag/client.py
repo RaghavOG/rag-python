@@ -2,7 +2,7 @@
 
 This wraps the full RAG pipeline behind a simple interface:
 
-    from ragkit import RAG
+    from minirag import RAG
 
     rag = RAG(llm_model="gpt-4o-mini", embedding_model="text-embedding-3-small")
     rag.ingest(["./docs", "README.md"])

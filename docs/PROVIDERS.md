@@ -1,6 +1,6 @@
 ## Providers
 
-RAGKit separates **LLM provider** (generation, rewriting, guardrails) from **embedding provider** (retrieval).
+MiniRAG separates **LLM provider** (generation, rewriting, guardrails) from **embedding provider** (retrieval).
 
 ### LLM providers
 
@@ -8,8 +8,8 @@ RAGKit separates **LLM provider** (generation, rewriting, guardrails) from **emb
 |----------|-----------------|-----|
 | OpenAI | `openai` | `OPENAI_API_KEY` |
 | Azure OpenAI | `azure_openai` | `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY` |
-| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` + `pip install ragkit[anthropic]` |
-| Gemini | `gemini` | `GEMINI_API_KEY` + `pip install ragkit[gemini]` |
+| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` + `pip install minirag[anthropic]` |
+| Gemini | `gemini` | `GEMINI_API_KEY` + `pip install minirag[gemini]` |
 | Ollama | `ollama` | Ollama running locally |
 
 ### Embedding providers
@@ -25,7 +25,7 @@ Anthropic and Gemini are **LLM-only** in this version — pair them with OpenAI 
 ### Reranking (optional)
 
 ```bash
-pip install ragkit[rerank]
+pip install minirag[rerank]
 ```
 
 Uses `sentence-transformers` cross-encoder (`BAAI/bge-reranker-base` by default).  

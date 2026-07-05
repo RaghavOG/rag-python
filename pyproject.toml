@@ -3,16 +3,16 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ragkit"
+name = "minirag"
 version = "0.1.0"
-description = "Production-grade modular RAG: multi-LLM, query rewriting, reranking, guardrails, and evaluation."
+description = "Lightweight production-grade RAG for Python: multi-LLM, query rewriting, reranking, guardrails, and evaluation."
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
 authors = [
   { name = "Raghav Singla", email = "raghavog@users.noreply.github.com" },
 ]
-keywords = ["rag", "llm", "embeddings", "chromadb", "openai", "retrieval-augmented-generation"]
+keywords = ["rag", "llm", "embeddings", "chromadb", "openai", "minirag", "retrieval-augmented-generation"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
@@ -41,10 +41,10 @@ rerank = ["sentence-transformers>=2.2.0", "torch>=2.0.0"]
 anthropic = ["anthropic>=0.20.0"]
 gemini = ["google-genai>=0.3.0"]
 dev = ["pytest>=7.0", "ruff>=0.1.0", "build", "twine"]
-all = ["ragkit[rerank,anthropic,gemini]"]
+all = ["minirag[rerank,anthropic,gemini]"]
 
 [project.scripts]
-ragkit = "ragkit.cli:main"
+minirag = "minirag.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/RaghavOG/rag-python"
@@ -56,7 +56,7 @@ Issues = "https://github.com/RaghavOG/rag-python/issues"
 where = ["src"]
 
 [tool.setuptools.package-data]
-ragkit = ["py.typed"]
+minirag = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

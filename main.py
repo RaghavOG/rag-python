@@ -1,9 +1,9 @@
-"""Thin CLI wrapper for local development (prefer: ragkit CLI after pip install -e .)."""
+"""Thin CLI wrapper for local development (prefer: minirag CLI after pip install -e .)."""
 import argparse
 from pathlib import Path
 
-from ragkit.config import DATA_DIR, CHUNK_STRATEGY
-from ragkit import ingest, query, RAGResponse
+from minirag.config import DATA_DIR, CHUNK_STRATEGY
+from minirag import ingest, query, RAGResponse
 
 
 def cmd_ingest(args):
@@ -34,7 +34,7 @@ def cmd_query(args):
 
 
 def cmd_chat(args):
-    print("RAGKit chat. Type your question. 'quit' or 'exit' to stop.")
+    print("MiniRAG chat. Type your question. 'quit' or 'exit' to stop.")
     while True:
         try:
             q = input("\nYou: ").strip()
@@ -49,7 +49,7 @@ def cmd_chat(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="RAGKit (local dev CLI)")
+    parser = argparse.ArgumentParser(description="MiniRAG (local dev CLI)")
     sub = parser.add_subparsers(dest="command", required=True)
 
     ing = sub.add_parser("ingest", help="Load documents, clean, chunk, embed, store")

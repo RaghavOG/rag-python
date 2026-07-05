@@ -3,7 +3,7 @@
 ### Python API
 
 ```python
-from ragkit import RAG
+from minirag import RAG
 
 rag = RAG(
     llm_provider="openai",
@@ -23,8 +23,8 @@ print(ans.evaluation)   # faithfulness / relevance scores
 
 ```bash
 pip install -e .
-ragkit ingest ./data --reindex
-ragkit query "How many days of annual leave?" -v
+minirag ingest ./data --reindex
+minirag query "How many days of annual leave?" -v
 ```
 
 ### Local development

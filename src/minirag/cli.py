@@ -1,7 +1,7 @@
-"""RAGKit command-line interface."""
+"""MiniRAG command-line interface."""
 import argparse
 
-from ragkit import RAG
+from .client import RAG
 
 
 def _build_rag(args: argparse.Namespace) -> RAG:
@@ -36,8 +36,8 @@ def _add_provider_args(parser: argparse.ArgumentParser) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        prog="ragkit",
-        description="RAGKit — modular RAG with query rewriting, reranking, guardrails, and multi-LLM support.",
+        prog="minirag",
+        description="MiniRAG — modular RAG with query rewriting, reranking, guardrails, and multi-LLM support.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
