@@ -11,12 +11,20 @@ from .providers import EmbeddingProvider
 COLLECTION_NAME = "rag_docs"
 # chromadb.PersistentClient is a factory function (not a type), so avoid using it in annotations.
 _chroma_client: Any | None = None
+_persist_dir: Path | None = None
+
+
+def set_persist_dir(path: Path | str) -> None:
+    """Override Chroma persistence directory (resets the client)."""
+    global _chroma_client, _persist_dir
+    _chroma_client = None
+    _persist_dir = Path(path)
 
 
 def _get_client() -> Any:
     global _chroma_client
     if _chroma_client is None:
-        p = Path(CHROMA_PERSIST_DIR)
+        p = Path(_persist_dir or CHROMA_PERSIST_DIR)
         p.mkdir(parents=True, exist_ok=True)
         _chroma_client = chromadb.PersistentClient(path=str(p), settings=Settings(anonymized_telemetry=False))
     return _chroma_client

@@ -38,7 +38,7 @@ def remove_header_footer_candidates(text: str, min_line_len: int = 10) -> str:
 
 def deduplicate_sentences(text: str) -> str:
     """Remove consecutive duplicate sentences (and near-duplicates by line)."""
-    lines = [normalize_whitespace(l) for l in text.splitlines() if l.strip()]
+    lines = [normalize_whitespace(line) for line in text.splitlines() if line.strip()]
     seen = set()
     out = []
     for line in lines:

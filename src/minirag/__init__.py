@@ -14,11 +14,23 @@ __version__ = "0.1.0"
 from .client import RAG, RAGAnswer
 from .rag_pipeline import ingest, query, RAGResponse
 from .providers import make_llm_provider, make_embedding_provider
+from .options import (
+    ChunkingConfig,
+    DocumentConfig,
+    QueryConfig,
+    RAGConfig,
+    SearchConfig,
+)
 
 __all__ = [
     "__version__",
     "RAG",
     "RAGAnswer",
+    "RAGConfig",
+    "ChunkingConfig",
+    "SearchConfig",
+    "DocumentConfig",
+    "QueryConfig",
     "ingest",
     "query",
     "RAGResponse",

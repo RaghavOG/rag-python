@@ -23,11 +23,14 @@ def rerank(
     query: str,
     documents: list[str],
     top_k: int = 5,
+    *,
+    rerank_enabled: bool | None = None,
 ) -> list[tuple[str, float, int]]:
     """Return (document, score, original_index) sorted by relevance."""
     if not documents:
         return []
-    if not RERANK_ENABLED:
+    use_rerank = RERANK_ENABLED if rerank_enabled is None else rerank_enabled
+    if not use_rerank:
         return [(documents[i], 0.0, i) for i in range(min(top_k, len(documents)))]
 
     try:
@@ -46,13 +49,15 @@ def rerank_with_metadata(
     query: str,
     doc_meta_list: list[tuple[str, dict[str, Any]]],
     top_k: int = 5,
+    *,
+    rerank_enabled: bool | None = None,
 ) -> list[tuple[str, dict[str, Any], float]]:
     """Rerank (document, metadata) pairs; return (doc, meta, score)."""
     if not doc_meta_list:
         return []
     docs = [d for d, _ in doc_meta_list]
     metas = [m for _, m in doc_meta_list]
-    results = rerank(query, docs, top_k=min(top_k, len(docs)))
+    results = rerank(query, docs, top_k=min(top_k, len(docs)), rerank_enabled=rerank_enabled)
     out = []
     for doc, score, idx in results:
         out.append((doc, metas[idx], score))

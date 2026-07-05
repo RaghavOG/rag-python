@@ -1,5 +1,5 @@
 """Query understanding & rewriting: expand/rewrite user query for better retrieval."""
-from .config import LLM_MODEL, MULTI_QUERY_N
+from .config import LLM_MODEL
 from .providers import LLMProvider, make_llm_provider
 
 
@@ -27,7 +27,7 @@ def rewrite_for_retrieval(
             temperature=0.3,
             max_tokens=200,
         )
-        lines = [l.strip() for l in text.splitlines() if l.strip()]
+        lines = [line.strip() for line in text.splitlines() if line.strip()]
         cleaned = []
         for line in lines[:n_queries]:
             for sep in (". ", ") ", "- ", " ", ""):
