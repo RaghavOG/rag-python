@@ -1,40 +1,44 @@
-## complete-basic-rag
+# RAGKit
 
-A **packaged, modular RAG toolkit** with:
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub](https://img.shields.io/badge/GitHub-RaghavOG%2Frag--python-blue)](https://github.com/RaghavOG/rag-python)
 
-- **Query understanding / rewriting**
-- **Multi-query retrieval**
-- **Reranking**
-- **LLM generation**
-- **Guardrails** (prompt injection + groundedness)
-- **Evaluation + retry/self-correction**
-- **Pluggable LLM providers**: OpenAI, Azure OpenAI, Anthropic, Gemini, Ollama
+**RAGKit** is a production-oriented Python library for **Retrieval-Augmented Generation (RAG)**.
 
-### Install
+Ingest your documents, ask questions, get grounded answers — with query rewriting, multi-query retrieval, reranking, guardrails, and multi-LLM support.
 
-For local dev:
+**Author:** [Raghav Singla](https://github.com/RaghavOG)  
+**Repository:** [github.com/RaghavOG/rag-python](https://github.com/RaghavOG/rag-python)
+
+---
+
+## Features
+
+- Document pipeline: loaders → cleaning → chunking → embeddings → ChromaDB
+- Query pipeline: rewriting → multi-query retrieval → reranking
+- Generation with guardrails (prompt injection + hallucination checks)
+- Evaluation scores + self-correction retry loop
+- **LLM providers:** OpenAI, Azure OpenAI, Anthropic, Gemini, Ollama
+
+---
+
+## Install
 
 ```bash
-pip install -r requirements.txt
-```
-
-Or install as a package (editable):
-
-```bash
+pip install ragkit
+# or from source
 pip install -e .
+# with reranking + extra providers
+pip install -e ".[rerank,anthropic,gemini,all]"
 ```
 
-Optional provider extras:
+---
 
-```bash
-pip install -e ".[anthropic]"
-pip install -e ".[gemini]"
-```
-
-### Quickstart (Python API)
+## Quickstart
 
 ```python
-from complete_basic_rag import RAG
+from ragkit import RAG
 
 rag = RAG(
     llm_provider="openai",
@@ -44,126 +48,75 @@ rag = RAG(
 )
 
 rag.ingest(["./data"], reindex=True)
-ans = rag.query("How many days of annual leave?")
-print(ans.text)
+answer = rag.query("How many days of annual leave?")
+print(answer.text)
 ```
 
-### Quickstart (CLI)
-
-After `pip install -e .` you get a console script:
+### CLI
 
 ```bash
-complete-basic-rag ingest ./data --reindex
-complete-basic-rag query "How many days of annual leave?"
+export OPENAI_API_KEY=sk-...
+ragkit ingest ./data --reindex
+ragkit query "How many days of annual leave?" -v
 ```
 
-### Providers
+---
 
-You can mix-and-match **LLM provider** and **embedding provider**.
+## Environment variables
 
-- **OpenAI (default)**:
-  - Env: `OPENAI_API_KEY`
-  - Example:
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENAI_API_KEY` | For OpenAI | Default LLM + embeddings |
+| `ANTHROPIC_API_KEY` | For Claude | LLM only |
+| `GEMINI_API_KEY` | For Gemini | LLM only |
+| `AZURE_OPENAI_ENDPOINT` | For Azure | Azure OpenAI |
+| `AZURE_OPENAI_API_KEY` | For Azure | Azure OpenAI |
+| `OPENAI_API_VERSION` | Azure | Default `2023-09-01-preview` |
+| `OLLAMA_BASE_URL` | Ollama | Default `http://localhost:11434` |
+| `RAGKIT_DATA_DIR` | Optional | Default `./data` |
+| `RAGKIT_CHROMA_DIR` | Optional | Default `./chroma_db` |
 
-```python
-rag = RAG(llm_provider="openai", llm_model="gpt-4o-mini", embedding_provider="openai", embedding_model="text-embedding-3-small")
-```
+See [`.env.example`](.env.example) for all tuning options.
 
-- **Azure OpenAI** (model = deployment name):
-  - Env: `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `OPENAI_API_VERSION`
-  - Example:
+---
 
-```python
-rag = RAG(
-  llm_provider="azure_openai",
-  llm_model="my-gpt-deployment",
-  embedding_provider="azure_openai",
-  embedding_model="my-embed-deployment",
-)
-```
-
-- **Anthropic (Claude)** (embeddings still need OpenAI/Azure/Ollama):
-
-```python
-rag = RAG(
-  llm_provider="anthropic",
-  llm_model="claude-opus-4-6",
-  embedding_provider="openai",
-  embedding_model="text-embedding-3-small",
-)
-```
-
-- **Gemini** (embeddings still need OpenAI/Azure/Ollama):
-
-```python
-rag = RAG(
-  llm_provider="gemini",
-  llm_model="gemini-2.0-flash",
-  embedding_provider="openai",
-  embedding_model="text-embedding-3-small",
-)
-```
-
-- **Ollama (local)**:
-  - Needs Ollama running (default `http://localhost:11434`)
-
-```python
-rag = RAG(
-  llm_provider="ollama",
-  llm_model="llama3.1",
-  embedding_provider="ollama",
-  embedding_model="mxbai-embed-large",
-)
-```
-
-### Frontend (later)
-
-The repo is structured to support a **separate frontend** (e.g. React/Vue/Svelte) alongside the backend:
-
-- `frontend/` – reserved for a future SPA / dashboard.
-- `.gitignore` already includes **Node / build artifacts** (`node_modules/`, `.vite/`, `.next/`, etc.).
-
-When you add a frontend, you can:
-
-- Put its source under `frontend/` (with its own `package.json`, build tooling, etc.).
-- Optionally expose the backend via a REST/GraphQL API or websocket layer on top of the existing RAG pipeline.
-
-### Repo structure (high level)
+## Project structure
 
 ```text
 .
-├─ main.py                 # CLI entrypoint (backend)
-├─ config.py               # Settings / env
-├─ complete_basic_rag/      # Public Python package API + CLI
-├─ backend/                 # Implementation (RAG pipeline + providers)
-│  └─ providers/            # OpenAI / Azure / Anthropic / Gemini / Ollama
-├─ data/
-│  └─ sample.txt           # Example document
-├─ frontend/               # (empty for now) future UI
-├─ requirements.txt
-├─ pyproject.toml           # Packaging config
-├─ .env.example
-└─ .gitignore
+├── src/ragkit/          # Installable package (PyPI)
+│   ├── client.py        # High-level RAG API
+│   ├── rag_pipeline.py  # Full pipeline
+│   └── providers/       # OpenAI, Azure, Anthropic, Gemini, Ollama
+├── tests/
+├── examples/
+├── docs/
+├── data/                # Sample documents
+├── pyproject.toml
+└── main.py              # Local dev CLI wrapper
 ```
 
-### Docs
+---
 
-- `docs/USAGE.md`
-- `docs/PROVIDERS.md`
-
-### Git & GitHub
-
-This folder is already initialized as a git repository (`git init` run from the root).  
-Next steps for GitHub:
-
-- Create a new GitHub repo.
-- Add this directory as the remote:
+## Publish to PyPI (maintainers)
 
 ```bash
-git add .
-git commit -m "Initial RAG backend"
-git branch -M main
-git remote add origin <your-github-repo-url>
-git push -u origin main
+pip install build twine
+python -m build
+twine upload --repository testpypi dist/*   # test first
+twine upload dist/*
 ```
 
+---
+
+## Docs
+
+- [Usage](docs/USAGE.md)
+- [Providers](docs/PROVIDERS.md)
+- [Changelog](CHANGELOG.md)
+
+---
+
+## License
+
+MIT © [Raghav Singla](https://github.com/RaghavOG)

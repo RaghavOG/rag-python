@@ -1,13 +1,29 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "complete-basic-rag"
+name = "ragkit"
 version = "0.1.0"
-description = "Modular RAG toolkit (OpenAI + Chroma) with query rewriting, reranking, guardrails, and evaluation."
+description = "Production-grade modular RAG: multi-LLM, query rewriting, reranking, guardrails, and evaluation."
 readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.10"
+authors = [
+  { name = "Raghav Singla", email = "raghavog@users.noreply.github.com" },
+]
+keywords = ["rag", "llm", "embeddings", "chromadb", "openai", "retrieval-augmented-generation"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
   "openai>=1.12.0",
   "tiktoken>=0.5.0",
@@ -16,20 +32,36 @@ dependencies = [
   "python-docx>=1.1.0",
   "langdetect>=1.0.9",
   "regex>=2023.0.0",
-  "sentence-transformers>=2.2.0",
-  "torch>=2.0.0",
   "python-dotenv>=1.0.0",
   "requests>=2.31.0",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "ruff"]
+rerank = ["sentence-transformers>=2.2.0", "torch>=2.0.0"]
 anthropic = ["anthropic>=0.20.0"]
 gemini = ["google-genai>=0.3.0"]
+dev = ["pytest>=7.0", "ruff>=0.1.0", "build", "twine"]
+all = ["ragkit[rerank,anthropic,gemini]"]
 
 [project.scripts]
-complete-basic-rag = "complete_basic_rag.cli:main"
+ragkit = "ragkit.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/your-name/complete-basic-rag"
+Homepage = "https://github.com/RaghavOG/rag-python"
+Repository = "https://github.com/RaghavOG/rag-python"
+Documentation = "https://github.com/RaghavOG/rag-python#readme"
+Issues = "https://github.com/RaghavOG/rag-python/issues"
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ragkit = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

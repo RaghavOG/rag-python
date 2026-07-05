@@ -1,34 +1,45 @@
 ## Providers
 
-This package separates:
+RAGKit separates **LLM provider** (generation, rewriting, guardrails) from **embedding provider** (retrieval).
 
-- **LLM provider** (generation, query rewriting, guardrails, evaluation)
-- **Embedding provider** (document + query embeddings for retrieval)
+### LLM providers
 
-### Supported LLM providers
+| Provider | `llm_provider=` | Env |
+|----------|-----------------|-----|
+| OpenAI | `openai` | `OPENAI_API_KEY` |
+| Azure OpenAI | `azure_openai` | `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY` |
+| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` + `pip install ragkit[anthropic]` |
+| Gemini | `gemini` | `GEMINI_API_KEY` + `pip install ragkit[gemini]` |
+| Ollama | `ollama` | Ollama running locally |
 
-- `openai`
-- `azure_openai` (model = deployment name)
-- `anthropic`
-- `gemini`
-- `ollama` (local)
+### Embedding providers
 
-### Supported embedding providers
+| Provider | `embedding_provider=` |
+|----------|----------------------|
+| OpenAI | `openai` |
+| Azure OpenAI | `azure_openai` |
+| Ollama | `ollama` |
 
-- `openai`
-- `azure_openai` (model = embedding deployment name)
-- `ollama` (local embedding model)
+Anthropic and Gemini are **LLM-only** in this version — pair them with OpenAI or Ollama embeddings.
 
-### Environment variables
+### Reranking (optional)
 
-- **OpenAI**: `OPENAI_API_KEY`
-- **Anthropic**: `ANTHROPIC_API_KEY`
-- **Gemini**: `GEMINI_API_KEY`
-- **Azure OpenAI**: `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY`, `OPENAI_API_VERSION`
-- **Ollama**: `OLLAMA_BASE_URL` (default `http://localhost:11434`)
+```bash
+pip install ragkit[rerank]
+```
 
-### Notes / gotchas
+Uses `sentence-transformers` cross-encoder (`BAAI/bge-reranker-base` by default).  
+Without `[rerank]`, retrieval order is used as fallback.
 
-- **Anthropic/Gemini**: this repo currently uses them for LLM tasks only; embeddings should come from `openai`, `azure_openai`, or `ollama`.
-- **Ollama**: you must have the model pulled locally (e.g. `ollama pull llama3.1`) and an embedding model for `embed` (e.g. `ollama pull mxbai-embed-large`).
+### Examples
 
+```python
+# OpenAI end-to-end
+rag = RAG(llm_provider="openai", embedding_provider="openai")
+
+# Claude + OpenAI embeddings
+rag = RAG(llm_provider="anthropic", llm_model="claude-opus-4-6", embedding_provider="openai")
+
+# Fully local with Ollama
+rag = RAG(llm_provider="ollama", llm_model="llama3.1", embedding_provider="ollama", embedding_model="mxbai-embed-large")
+```

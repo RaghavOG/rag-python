@@ -1,9 +1,9 @@
 ## Usage
 
-### Python API (recommended)
+### Python API
 
 ```python
-from complete_basic_rag import RAG
+from ragkit import RAG
 
 rag = RAG(
     llm_provider="openai",
@@ -15,20 +15,23 @@ rag = RAG(
 rag.ingest(["./data"], reindex=True)
 ans = rag.query("How many days of annual leave?")
 print(ans.text)
+print(ans.sources)      # retrieved chunks
+print(ans.evaluation)   # faithfulness / relevance scores
 ```
 
 ### CLI
 
-Install editable first:
-
 ```bash
 pip install -e .
+ragkit ingest ./data --reindex
+ragkit query "How many days of annual leave?" -v
 ```
 
-Then:
+### Local development
 
 ```bash
-complete-basic-rag ingest ./data --reindex
-complete-basic-rag query "How many days of annual leave?"
+pip install -e ".[dev,rerank]"
+pytest
+python main.py ingest --reindex
+python main.py chat
 ```
-
