@@ -18,7 +18,7 @@ Ingest your documents, ask questions, get grounded answers — with query rewrit
 ## Features
 
 - Document pipeline: loaders → cleaning → chunking → embeddings → ChromaDB
-- Query pipeline: rewriting → multi-query / **hybrid** retrieval → reranking
+- Query pipeline: rewriting → multi-query / **hybrid** retrieval → reranking → **streaming**
 - Generation with guardrails (prompt injection + hallucination checks)
 - Evaluation scores + self-correction retry loop
 - **LLM providers:** OpenAI, Azure OpenAI, Anthropic, Gemini, Ollama
@@ -55,6 +55,20 @@ answer = rag.query("How many days of annual leave?")
 print(answer.text)
 ```
 
+### Streaming answers
+
+```python
+import rag_python
+
+rag_python.configure_logging()  # optional: enable INFO logs
+
+stream = rag.query_stream("How many days of annual leave?")
+for token in stream:
+    print(token, end="", flush=True)
+print()
+print(stream.result.sources)  # available after stream ends
+```
+
 ### Hybrid search + metadata filter
 
 ```python
@@ -75,6 +89,7 @@ export OPENAI_API_KEY=sk-...
 rag-python ingest ./data --reindex
 rag-python query "How many days of annual leave?" -v
 rag-python query "leave policy" --retriever hybrid --metadata-filter '{"filename": "leave-policy.pdf"}'
+rag-python query "annual leave" --stream
 ```
 
 ---

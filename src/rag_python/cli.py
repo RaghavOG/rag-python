@@ -90,6 +90,7 @@ def main() -> None:
     q = sub.add_parser("query", help="Ask a question against ingested documents")
     q.add_argument("question", nargs="+", help="Question text")
     q.add_argument("--no-multi-query", action="store_true", help="Use vector retriever only")
+    q.add_argument("--stream", action="store_true", help="Stream answer tokens to stdout")
     q.add_argument("-v", "--verbose", action="store_true")
     _add_provider_args(q)
     _add_search_args(q)
@@ -113,6 +114,20 @@ def main() -> None:
             retriever=retriever or rag.config.search.retriever,
             metadata_filter=args.metadata_filter or rag.config.search.metadata_filter,
         )
+        if args.stream:
+            stream = rag.query_stream(question, search=search)
+            for token in stream:
+                print(token, end="", flush=True)
+            print()
+            result = stream.result
+            if args.verbose:
+                print("\n--- evaluation ---")
+                print(result.evaluation)
+                print("\n--- sources ---")
+                for s in result.sources[:5]:
+                    print(s.get("metadata", {}).get("source", ""), "score:", s.get("score"))
+            return
+
         ans = rag.query(question, search=search)
         print(ans.text)
         if args.verbose:

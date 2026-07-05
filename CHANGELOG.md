@@ -8,8 +8,10 @@ All notable changes to **rag-python** are documented here.
 - **Hybrid retrieval** (`retriever="hybrid"`): BM25 + vector search fused with reciprocal rank fusion — `pip install rag-python[hybrid]`
 - **Metadata filtering** at query time via `SearchConfig.metadata_filter` or `RAG(metadata_filter={...})`
 - Document loaders for **CSV**, **JSON**, and **HTML**
-- CLI flags: `--retriever`, `--metadata-filter`
-- Pipeline logging for ingest and retrieval
+- CLI flags: `--retriever`, `--metadata-filter`, `--stream`
+- **`rag.query_stream()`** — stream answer tokens for responsive UX
+- Structured **logging** via `rag_python.get_logger()` / `configure_logging()`
+- Pipeline logging for ingest, retrieval, guardrails, and evaluation
 
 ### Changed
 - Default supported ingest extensions include `.csv`, `.json`, `.html`

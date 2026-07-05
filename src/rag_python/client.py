@@ -30,7 +30,7 @@ from .options import (
     SearchConfig,
 )
 from .providers import make_llm_provider, make_embedding_provider
-from .rag_pipeline import ingest as _ingest, query as _query, RAGResponse
+from .rag_pipeline import ingest as _ingest, query as _query, query_stream as _query_stream, RAGResponse, RAGStream
 from .vector_store import set_persist_dir
 
 
@@ -190,4 +190,22 @@ class RAG:
             sources=resp.sources,
             evaluation=resp.evaluation,
             retried=resp.retried,
+        )
+
+    def query_stream(
+        self,
+        question: str,
+        *,
+        search: SearchConfig | None = None,
+        query_config: QueryConfig | None = None,
+    ) -> RAGStream:
+        """Stream answer tokens; call ``stream.result`` after iterating."""
+        return _query_stream(
+            question,
+            search=search or self.config.search,
+            query_config=query_config or self.config.query,
+            llm_model=self.llm_model,
+            embedding_model=self.embedding_model,
+            llm=self.llm,
+            embedder=self.embedder,
         )

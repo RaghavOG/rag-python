@@ -12,8 +12,9 @@ Quick start::
 __version__ = "0.3.0"
 
 from .client import RAG, RAGAnswer
-from .rag_pipeline import ingest, query, RAGResponse
+from .rag_pipeline import ingest, query, query_stream, RAGResponse, RAGStream
 from .providers import make_llm_provider, make_embedding_provider
+from .log import configure_logging, get_logger
 from .options import (
     ChunkingConfig,
     DocumentConfig,
@@ -33,7 +34,11 @@ __all__ = [
     "QueryConfig",
     "ingest",
     "query",
+    "query_stream",
+    "RAGStream",
     "RAGResponse",
+    "configure_logging",
+    "get_logger",
     "make_llm_provider",
     "make_embedding_provider",
 ]

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
+
 
 class AnthropicProvider:
     def __init__(self, *, api_key: str | None = None) -> None:
@@ -35,6 +37,27 @@ class AnthropicProvider:
             if text:
                 parts.append(text)
         return ("\n".join(parts)).strip()
+
+    def generate_stream(
+        self,
+        *,
+        user: str,
+        system: str | None = None,
+        model: str | None = None,
+        temperature: float = 0.2,
+        max_tokens: int = 1024,
+    ) -> Iterator[str]:
+        if not model:
+            raise RuntimeError("AnthropicProvider requires `model=...` (e.g. claude-...)")
+        with self._client.messages.stream(
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            system=system or "",
+            messages=[{"role": "user", "content": user}],
+        ) as stream:
+            for text in stream.text_stream:
+                yield text
 
     def embed(self, texts: list[str], *, model: str | None = None) -> list[list[float]]:
         raise RuntimeError("Anthropic does not provide embeddings in this package. Use OpenAI/Ollama or local embeddings.")

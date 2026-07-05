@@ -49,6 +49,19 @@ rag-python query "How many days of annual leave?" -v
 rag-python query "annual leave" --retriever hybrid
 ```
 
+### Streaming
+
+```python
+stream = rag.query_stream("annual leave")
+for token in stream:
+    print(token, end="", flush=True)
+print(stream.result.evaluation)
+```
+
+```bash
+rag-python query "annual leave" --stream
+```
+
 ### Local development
 
 ```bash
