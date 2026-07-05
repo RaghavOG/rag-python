@@ -2,6 +2,18 @@
 
 All notable changes to **rag-python** are documented here.
 
+## [0.3.0] - 2026-07-05
+
+### Added
+- **Hybrid retrieval** (`retriever="hybrid"`): BM25 + vector search fused with reciprocal rank fusion — `pip install rag-python[hybrid]`
+- **Metadata filtering** at query time via `SearchConfig.metadata_filter` or `RAG(metadata_filter={...})`
+- Document loaders for **CSV**, **JSON**, and **HTML**
+- CLI flags: `--retriever`, `--metadata-filter`
+- Pipeline logging for ingest and retrieval
+
+### Changed
+- Default supported ingest extensions include `.csv`, `.json`, `.html`
+
 ## [0.2.0] - 2026-07-05
 
 ### Added
@@ -31,5 +43,6 @@ All notable changes to **rag-python** are documented here.
 - Data/chroma paths default to cwd (`RAG_PYTHON_DATA_DIR`, `RAG_PYTHON_CHROMA_DIR`)
 - Reranking moved to optional dependency (`pip install rag-python[rerank]`)
 
+[0.3.0]: https://github.com/RaghavOG/rag-python/releases/tag/v0.3.0
 [0.2.0]: https://github.com/RaghavOG/rag-python/releases/tag/v0.2.0
 [0.1.0]: https://github.com/RaghavOG/rag-python/releases/tag/v0.1.0

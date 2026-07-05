@@ -18,10 +18,11 @@ Ingest your documents, ask questions, get grounded answers — with query rewrit
 ## Features
 
 - Document pipeline: loaders → cleaning → chunking → embeddings → ChromaDB
-- Query pipeline: rewriting → multi-query retrieval → reranking
+- Query pipeline: rewriting → multi-query / **hybrid** retrieval → reranking
 - Generation with guardrails (prompt injection + hallucination checks)
 - Evaluation scores + self-correction retry loop
 - **LLM providers:** OpenAI, Azure OpenAI, Anthropic, Gemini, Ollama
+- **Loaders:** TXT, MD, PDF, DOCX, CSV, JSON, HTML
 
 ---
 
@@ -32,7 +33,7 @@ pip install rag-python
 # or from source
 pip install -e .
 # with reranking + extra providers
-pip install -e ".[rerank,local,anthropic,gemini,all]"
+pip install -e ".[rerank,local,hybrid,anthropic,gemini,all]"
 ```
 
 ---
@@ -54,12 +55,26 @@ answer = rag.query("How many days of annual leave?")
 print(answer.text)
 ```
 
+### Hybrid search + metadata filter
+
+```python
+from rag_python import RAG, SearchConfig
+
+rag = RAG(
+    retriever="hybrid",  # pip install rag-python[hybrid]
+    metadata_filter={"filename": "leave-policy.pdf"},
+)
+rag.ingest(["./policies/leave-policy.pdf", "./policies/handbook.pdf"])
+answer = rag.query("How many days of annual leave?")
+```
+
 ### CLI
 
 ```bash
 export OPENAI_API_KEY=sk-...
 rag-python ingest ./data --reindex
 rag-python query "How many days of annual leave?" -v
+rag-python query "leave policy" --retriever hybrid --metadata-filter '{"filename": "leave-policy.pdf"}'
 ```
 
 ---

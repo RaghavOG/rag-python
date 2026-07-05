@@ -85,6 +85,19 @@ def retrieve(
     return list(zip(docs, metas, dists))
 
 
+def list_documents(
+    *,
+    where: dict | None = None,
+    limit: int | None = None,
+) -> tuple[list[str], list[dict[str, Any]]]:
+    """Return all stored chunk texts and metadata (for BM25 indexing)."""
+    coll = get_collection()
+    res = coll.get(where=where, include=["documents", "metadatas"], limit=limit)
+    docs = res.get("documents") or []
+    metas = res.get("metadatas") or []
+    return docs, metas
+
+
 def delete_all() -> None:
     """Remove all documents from the collection (for re-ingestion)."""
     _get_client().delete_collection(COLLECTION_NAME)

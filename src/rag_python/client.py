@@ -60,6 +60,7 @@ class RAG:
         chunk_size: int | None = None,
         chunk_overlap: int | None = None,
         retriever: str | None = None,
+        metadata_filter: dict | None = None,
         top_k_retrieve: int | None = None,
         top_k_rerank: int | None = None,
         multi_query_n: int | None = None,
@@ -104,6 +105,8 @@ class RAG:
             self.config.search = replace(self.config.search, rerank_enabled=rerank_enabled)
         if document_extensions is not None:
             self.config.documents = replace(self.config.documents, extensions=document_extensions)
+        if metadata_filter is not None:
+            self.config.search = replace(self.config.search, metadata_filter=metadata_filter)
 
         self.llm = make_llm_provider(
             llm_provider,  # type: ignore[arg-type]

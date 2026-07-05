@@ -9,7 +9,7 @@ Quick start::
     print(rag.query("What is our leave policy?").text)
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 from .client import RAG, RAGAnswer
 from .rag_pipeline import ingest, query, RAGResponse

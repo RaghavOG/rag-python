@@ -1,4 +1,5 @@
 """Full RAG pipeline: Query → Understanding/Rewrite → Retrieval (multi-query) → Rerank → LLM → Guardrails → Eval/Retry."""
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -13,6 +14,8 @@ from .evaluation import evaluate_rag, should_retry, self_correct
 from .providers import LLMProvider, EmbeddingProvider, make_llm_provider, make_embedding_provider
 from .config import DATA_DIR, CHUNK_SIZE, CHUNK_OVERLAP, CHUNK_STRATEGY
 from .options import QueryConfig, SearchConfig
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -34,7 +37,7 @@ def _load_documents(
     paths: list[Path] | None = None,
     data_path: Path | None = None,
     *,
-    extensions: tuple[str, ...] = (".txt", ".md", ".pdf", ".docx"),
+    extensions: tuple[str, ...] = (".txt", ".md", ".pdf", ".docx", ".csv", ".json", ".html"),
 ) -> list[LoadedDocument]:
     """Load documents from explicit paths and/or a data directory."""
     docs: list[LoadedDocument] = []
@@ -136,12 +139,13 @@ def ingest(
     strategy = chunk_strategy or CHUNK_STRATEGY
     size = chunk_size or CHUNK_SIZE
     overlap = chunk_overlap or CHUNK_OVERLAP
-    ext = extensions or (".txt", ".md", ".pdf", ".docx")
+    ext = extensions or (".txt", ".md", ".pdf", ".docx", ".csv", ".json", ".html")
     embedder = embedder or make_embedding_provider("openai")
 
     path_list = [Path(p) for p in paths] if paths else None
     root = Path(data_path) if data_path else (None if path_list else Path(DATA_DIR))
     docs = _load_documents(path_list, root, extensions=ext)
+    logger.info("Loaded %s documents for ingest", len(docs))
     return _ingest_documents(
         docs,
         clean=clean,
@@ -202,11 +206,13 @@ def query(
         top_k_retrieve=search_cfg.top_k_retrieve,
         top_k_rerank=search_cfg.top_k_rerank,
         rerank_enabled=search_cfg.rerank_enabled,
+        metadata_filter=search_cfg.metadata_filter,
         embedder=embedder,
         embedding_model=embedding_model,
         llm=llm,
         llm_model=llm_model,
     )
+    logger.info("Retrieved %s chunks (retriever=%s)", len(hits), search_cfg.retriever)
     context_chunks = [h[0] for h in hits]
     sources = [{"text": h[0][:200], "metadata": h[1], "score": h[2]} for h in hits]
     context_str = "\n\n".join(context_chunks)

@@ -16,7 +16,7 @@ from .config import (
 )
 
 ChunkStrategy = Literal["recursive", "structure_aware", "semantic"]
-RetrieverStrategy = Literal["vector", "multi_query"]
+RetrieverStrategy = Literal["vector", "multi_query", "hybrid"]
 
 
 @dataclass
@@ -37,13 +37,14 @@ class SearchConfig:
     top_k_rerank: int = TOP_K_RERANK
     multi_query_n: int = MULTI_QUERY_N
     rerank_enabled: bool = RERANK_ENABLED
+    metadata_filter: dict | None = None
 
 
 @dataclass
 class DocumentConfig:
     """Which files to load and how to preprocess them."""
 
-    extensions: tuple[str, ...] = (".txt", ".md", ".pdf", ".docx")
+    extensions: tuple[str, ...] = (".txt", ".md", ".pdf", ".docx", ".csv", ".json", ".html")
     clean: bool = True
     copy_to_data_dir: bool = True
 

@@ -1,5 +1,6 @@
 """rag-python command-line interface."""
 import argparse
+import json
 from dataclasses import replace
 
 from . import __version__
@@ -7,7 +8,7 @@ from .client import RAG
 
 
 def _build_rag(args: argparse.Namespace) -> RAG:
-    return RAG(
+    kwargs: dict = dict(
         llm_provider=args.llm_provider,
         llm_model=args.llm_model,
         embedding_provider=args.embedding_provider,
@@ -20,6 +21,20 @@ def _build_rag(args: argparse.Namespace) -> RAG:
         gemini_api_key=args.gemini_api_key,
         ollama_base_url=args.ollama_base_url,
     )
+    if getattr(args, "retriever", None):
+        kwargs["retriever"] = args.retriever
+    if getattr(args, "metadata_filter", None):
+        kwargs["metadata_filter"] = args.metadata_filter
+    return RAG(**kwargs)
+
+
+def _parse_metadata_filter(raw: str | None) -> dict | None:
+    if not raw:
+        return None
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise argparse.ArgumentTypeError(f"Invalid JSON for metadata filter: {e}") from e
 
 
 def _add_provider_args(parser: argparse.ArgumentParser) -> None:
@@ -44,6 +59,21 @@ def _add_provider_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--gemini-api-key", default=None)
 
 
+def _add_search_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--retriever",
+        choices=["vector", "multi_query", "hybrid"],
+        default=None,
+        help="Retrieval strategy (default: multi_query; hybrid needs pip install rag-python[hybrid])",
+    )
+    parser.add_argument(
+        "--metadata-filter",
+        type=_parse_metadata_filter,
+        default=None,
+        help='Chroma metadata filter as JSON, e.g. \'{"filename": "policy.pdf"}\'',
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="rag-python",
@@ -59,9 +89,10 @@ def main() -> None:
 
     q = sub.add_parser("query", help="Ask a question against ingested documents")
     q.add_argument("question", nargs="+", help="Question text")
-    q.add_argument("--no-multi-query", action="store_true")
+    q.add_argument("--no-multi-query", action="store_true", help="Use vector retriever only")
     q.add_argument("-v", "--verbose", action="store_true")
     _add_provider_args(q)
+    _add_search_args(q)
 
     args = parser.parse_args()
 
@@ -74,9 +105,13 @@ def main() -> None:
     if args.command == "query":
         rag = _build_rag(args)
         question = " ".join(args.question)
+        retriever = args.retriever
+        if retriever is None and args.no_multi_query:
+            retriever = "vector"
         search = replace(
             rag.config.search,
-            retriever="vector" if args.no_multi_query else "multi_query",
+            retriever=retriever or rag.config.search.retriever,
+            metadata_filter=args.metadata_filter or rag.config.search.metadata_filter,
         )
         ans = rag.query(question, search=search)
         print(ans.text)
