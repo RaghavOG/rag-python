@@ -1,4 +1,4 @@
-from complete_basic_rag import RAG
+from ragkit import RAG
 
 
 def main():
@@ -18,4 +18,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

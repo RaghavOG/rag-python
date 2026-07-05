@@ -1,22 +1,9 @@
-"""
-Complete RAG pipeline with OpenAI LLM.
-
-Features:
-- Documents: Loaders → Cleaning → Chunking (recursive / structure-aware / semantic) → Embeddings → Vector DB
-- Query: Understanding & Rewrite → Multi-query retrieval → Reranking
-- Generation: OpenAI LLM → Input guardrails (prompt injection) → Output guardrails (hallucination)
-- Evaluation & retry/self-correction
-
-Usage:
-  python main.py ingest [--path DATA_DIR] [--reindex] [--strategy recursive|structure_aware|semantic]
-  python main.py query "Your question here"
-  python main.py chat   # interactive
-"""
+"""Thin CLI wrapper for local development (prefer: ragkit CLI after pip install -e .)."""
 import argparse
 from pathlib import Path
 
-from config import DATA_DIR, CHUNK_STRATEGY
-from backend.rag_pipeline import ingest, query, RAGResponse
+from ragkit.config import DATA_DIR, CHUNK_STRATEGY
+from ragkit import ingest, query, RAGResponse
 
 
 def cmd_ingest(args):
@@ -47,7 +34,7 @@ def cmd_query(args):
 
 
 def cmd_chat(args):
-    print("RAG chat. Type your question and press Enter. 'quit' or 'exit' to stop.")
+    print("RAGKit chat. Type your question. 'quit' or 'exit' to stop.")
     while True:
         try:
             q = input("\nYou: ").strip()
@@ -62,7 +49,7 @@ def cmd_chat(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Complete RAG with OpenAI")
+    parser = argparse.ArgumentParser(description="RAGKit (local dev CLI)")
     sub = parser.add_subparsers(dest="command", required=True)
 
     ing = sub.add_parser("ingest", help="Load documents, clean, chunk, embed, store")
@@ -74,9 +61,9 @@ def main():
     q = sub.add_parser("query", help="Ask a question")
     q.add_argument("question", type=str, nargs="+", help="Question (words joined)")
     q.add_argument("-v", "--verbose", action="store_true")
-    q.add_argument("--no-multi-query", action="store_true", help="Disable multi-query expansion")
-    q.add_argument("--no-guardrails", action="store_true", help="Disable input/output guardrails")
-    q.add_argument("--no-retry", action="store_true", help="Disable eval/retry loop")
+    q.add_argument("--no-multi-query", action="store_true")
+    q.add_argument("--no-guardrails", action="store_true")
+    q.add_argument("--no-retry", action="store_true")
     q.set_defaults(func=cmd_query)
 
     chat = sub.add_parser("chat", help="Interactive Q&A")
