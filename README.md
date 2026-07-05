@@ -98,17 +98,6 @@ See [`.env.example`](.env.example) for all tuning options.
 
 ---
 
-## Publish to PyPI (maintainers)
-
-```bash
-pip install build twine
-python -m build
-twine upload --repository testpypi dist/*   # test first
-twine upload dist/*
-```
-
----
-
 ## Docs
 
 - [Usage](docs/USAGE.md)
