@@ -1,20 +1,20 @@
 # Changelog
 
-All notable changes to **MiniRAG** (`minirag` on PyPI) are documented here.
+All notable changes to **rag-python** are documented here.
 
 ## [0.1.0] - 2026-07-05
 
 ### Added
-- Production `src/minirag/` package layout (PyPI-ready)
+- Production `src/rag_python/` package layout (PyPI: `rag-python`)
 - High-level `RAG` client with multi-provider LLM support (OpenAI, Azure, Anthropic, Gemini, Ollama)
 - Full RAG pipeline: ingest → query rewrite → multi-query retrieval → rerank → generate → guardrails → eval/retry
-- CLI: `minirag ingest` / `minirag query`
+- CLI: `rag-python ingest` / `rag-python query`
+- Configurable chunking, retrieval, and multi-document ingest via `RAGConfig`
 - Optional extras: `[rerank]`, `[anthropic]`, `[gemini]`, `[all]`
 
 ### Changed
-- Renamed public package from `complete-basic-rag` → **`minirag`**
-- Moved all implementation under installable `src/minirag/`
-- Data/chroma paths default to cwd (`MINIRAG_DATA_DIR`, `MINIRAG_CHROMA_DIR`)
-- Reranking moved to optional dependency (`pip install minirag[rerank]`)
+- PyPI package name: **`rag-python`** (import: `rag_python`)
+- Data/chroma paths default to cwd (`RAG_PYTHON_DATA_DIR`, `RAG_PYTHON_CHROMA_DIR`)
+- Reranking moved to optional dependency (`pip install rag-python[rerank]`)
 
 [0.1.0]: https://github.com/RaghavOG/rag-python/releases/tag/v0.1.0

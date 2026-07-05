@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from minirag.config import (
+from rag_python.config import (
     CHUNK_STRATEGY,
     DATA_DIR,
     CHROMA_PERSIST_DIR,

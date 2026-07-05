@@ -1,10 +1,10 @@
-# MiniRAG
+# rag-python
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-RaghavOG%2Frag--python-blue)](https://github.com/RaghavOG/rag-python)
 
-**MiniRAG** is a lightweight, production-oriented Python library for **Retrieval-Augmented Generation (RAG)**.
+**rag-python** is a production-oriented Python library for **Retrieval-Augmented Generation (RAG)**.
 
 Ingest your documents, ask questions, get grounded answers — with query rewriting, multi-query retrieval, reranking, guardrails, and multi-LLM support.
 
@@ -26,7 +26,7 @@ Ingest your documents, ask questions, get grounded answers — with query rewrit
 ## Install
 
 ```bash
-pip install minirag
+pip install rag-python
 # or from source
 pip install -e .
 # with reranking + extra providers
@@ -38,7 +38,7 @@ pip install -e ".[rerank,anthropic,gemini,all]"
 ## Quickstart
 
 ```python
-from minirag import RAG
+from rag_python import RAG
 
 rag = RAG(
     llm_provider="openai",
@@ -56,8 +56,8 @@ print(answer.text)
 
 ```bash
 export OPENAI_API_KEY=sk-...
-minirag ingest ./data --reindex
-minirag query "How many days of annual leave?" -v
+rag-python ingest ./data --reindex
+rag-python query "How many days of annual leave?" -v
 ```
 
 ---
@@ -73,8 +73,8 @@ minirag query "How many days of annual leave?" -v
 | `AZURE_OPENAI_API_KEY` | For Azure | Azure OpenAI |
 | `OPENAI_API_VERSION` | Azure | Default `2023-09-01-preview` |
 | `OLLAMA_BASE_URL` | Ollama | Default `http://localhost:11434` |
-| `MINIRAG_DATA_DIR` | Optional | Default `./data` |
-| `MINIRAG_CHROMA_DIR` | Optional | Default `./chroma_db` |
+| `RAG_PYTHON_DATA_DIR` | Optional | Default `./data` |
+| `RAG_PYTHON_CHROMA_DIR` | Optional | Default `./chroma_db` |
 
 See [`.env.example`](.env.example) for all tuning options.
 
@@ -84,7 +84,7 @@ See [`.env.example`](.env.example) for all tuning options.
 
 ```text
 .
-├── src/minirag/         # Installable package (PyPI)
+├── src/rag_python/      # Installable package (PyPI: rag-python)
 │   ├── client.py        # High-level RAG API
 │   ├── rag_pipeline.py  # Full pipeline
 │   └── providers/       # OpenAI, Azure, Anthropic, Gemini, Ollama

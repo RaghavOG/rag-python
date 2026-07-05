@@ -1,8 +1,8 @@
-"""MiniRAG — lightweight production-grade RAG for Python.
+"""rag-python — production-grade RAG for Python.
 
 Quick start::
 
-    from minirag import RAG
+    from rag_python import RAG
 
     rag = RAG(llm_model="gpt-4o-mini")
     rag.ingest(["./docs"], reindex=True)

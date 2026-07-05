@@ -2,7 +2,7 @@
 
 This wraps the full RAG pipeline behind a simple interface:
 
-    from minirag import RAG, RAGConfig, ChunkingConfig, SearchConfig
+    from rag_python import RAG, RAGConfig, ChunkingConfig, SearchConfig
 
     rag = RAG(
         llm_model="gpt-4o-mini",

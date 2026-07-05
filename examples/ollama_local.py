@@ -1,4 +1,4 @@
-from minirag import RAG
+from rag_python import RAG
 
 rag = RAG(
     llm_provider="ollama",

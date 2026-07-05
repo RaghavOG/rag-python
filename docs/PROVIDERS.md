@@ -1,6 +1,6 @@
 ## Providers
 
-MiniRAG separates **LLM provider** (generation, rewriting, guardrails) from **embedding provider** (retrieval).
+rag-python separates **LLM provider** (generation, rewriting, guardrails) from **embedding provider** (retrieval).
 
 ### LLM providers
 
@@ -8,8 +8,8 @@ MiniRAG separates **LLM provider** (generation, rewriting, guardrails) from **em
 |----------|-----------------|-----|
 | OpenAI | `openai` | `OPENAI_API_KEY` |
 | Azure OpenAI | `azure_openai` | `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY` |
-| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` + `pip install minirag[anthropic]` |
-| Gemini | `gemini` | `GEMINI_API_KEY` + `pip install minirag[gemini]` |
+| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` + `pip install rag-python[anthropic]` |
+| Gemini | `gemini` | `GEMINI_API_KEY` + `pip install rag-python[gemini]` |
 | Ollama | `ollama` | Ollama running locally |
 
 ### Embedding providers
@@ -25,7 +25,7 @@ Anthropic and Gemini are **LLM-only** in this version — pair them with OpenAI 
 ### Reranking (optional)
 
 ```bash
-pip install minirag[rerank]
+pip install rag-python[rerank]
 ```
 
 Uses `sentence-transformers` cross-encoder (`BAAI/bge-reranker-base` by default).  

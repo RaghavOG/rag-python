@@ -13,7 +13,7 @@ def _get_reranker():
             from sentence_transformers import CrossEncoder
         except ImportError as e:
             raise ImportError(
-                "Reranking requires optional dependencies. Install with: pip install minirag[rerank]"
+                "Reranking requires optional dependencies. Install with: pip install rag-python[rerank]"
             ) from e
         _reranker = CrossEncoder(RERANKER_MODEL)
     return _reranker

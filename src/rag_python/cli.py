@@ -1,4 +1,4 @@
-"""MiniRAG command-line interface."""
+"""rag-python command-line interface."""
 import argparse
 
 from .client import RAG
@@ -36,8 +36,8 @@ def _add_provider_args(parser: argparse.ArgumentParser) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        prog="minirag",
-        description="MiniRAG — modular RAG with query rewriting, reranking, guardrails, and multi-LLM support.",
+        prog="rag-python",
+        description="rag-python — modular RAG with query rewriting, reranking, guardrails, and multi-LLM support.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
