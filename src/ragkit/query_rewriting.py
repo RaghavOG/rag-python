@@ -1,5 +1,5 @@
 """Query understanding & rewriting: expand/rewrite user query for better retrieval."""
-from config import LLM_MODEL, MULTI_QUERY_N
+from .config import LLM_MODEL, MULTI_QUERY_N
 from .providers import LLMProvider, make_llm_provider
 
 

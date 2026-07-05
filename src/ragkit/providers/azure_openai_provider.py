@@ -1,16 +1,32 @@
 from __future__ import annotations
 
-from openai import OpenAI
+from openai import AzureOpenAI
 
-from config import OPENAI_API_KEY, LLM_MODEL, EMBEDDING_MODEL
+from ..config import LLM_MODEL, EMBEDDING_MODEL
 
 
-class OpenAIProvider:
-    def __init__(self, *, api_key: str | None = None) -> None:
-        api_key = api_key or OPENAI_API_KEY
+class AzureOpenAIProvider:
+    """Azure OpenAI provider.
+
+    Note: For Azure, `model` should be your *deployment name*.
+    """
+
+    def __init__(
+        self,
+        *,
+        azure_endpoint: str,
+        api_key: str,
+        api_version: str = "2023-09-01-preview",
+    ) -> None:
+        if not azure_endpoint:
+            raise RuntimeError("azure_endpoint is required for Azure OpenAI")
         if not api_key:
-            raise RuntimeError("OpenAI API key missing. Set OPENAI_API_KEY or pass api_key=...")
-        self._client = OpenAI(api_key=api_key)
+            raise RuntimeError("api_key is required for Azure OpenAI")
+        self._client = AzureOpenAI(
+            azure_endpoint=azure_endpoint,
+            api_key=api_key,
+            api_version=api_version,
+        )
 
     def generate(
         self,

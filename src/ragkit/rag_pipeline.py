@@ -12,7 +12,7 @@ from .generation import generate
 from .guardrails import check_prompt_injection, check_hallucination
 from .evaluation import evaluate_rag, should_retry, self_correct
 from .providers import LLMProvider, EmbeddingProvider, make_llm_provider, make_embedding_provider
-from config import (
+from .config import (
     DATA_DIR,
     CHUNK_SIZE,
     CHUNK_OVERLAP,

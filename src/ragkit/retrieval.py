@@ -5,7 +5,7 @@ from .vector_store import retrieve as chroma_retrieve
 from .query_rewriting import rewrite_for_retrieval
 from .reranker import rerank_with_metadata
 from .providers import EmbeddingProvider, LLMProvider
-from config import TOP_K_RETRIEVE, TOP_K_RERANK, MULTI_QUERY_N
+from .config import TOP_K_RETRIEVE, TOP_K_RERANK, MULTI_QUERY_N
 
 
 def retrieve(

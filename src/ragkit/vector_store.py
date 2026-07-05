@@ -5,7 +5,7 @@ from typing import Any
 import chromadb
 from chromadb.config import Settings
 
-from config import CHROMA_PERSIST_DIR
+from .config import CHROMA_PERSIST_DIR
 from .providers import EmbeddingProvider
 
 COLLECTION_NAME = "rag_docs"

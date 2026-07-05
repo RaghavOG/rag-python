@@ -1,5 +1,5 @@
 """Input guardrails (prompt injection) and output guardrails (hallucination / off-topic)."""
-from config import LLM_MODEL, GUARDRAILS_ENABLED
+from .config import LLM_MODEL, GUARDRAILS_ENABLED
 from .providers import LLMProvider, make_llm_provider
 
 

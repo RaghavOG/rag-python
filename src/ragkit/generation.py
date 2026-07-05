@@ -1,5 +1,5 @@
 """LLM generation with context (RAG)."""
-from config import LLM_MODEL
+from .config import LLM_MODEL
 from .providers import LLMProvider, make_llm_provider
 
 

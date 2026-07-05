@@ -1,19 +1,22 @@
-"""Configuration: load from env (OPENAI_API_KEY, etc.)."""
+"""Configuration loaded from environment variables."""
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# OpenAI
+# API keys (provider-specific)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# Models
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 
-# Paths
-PROJECT_ROOT = Path(__file__).resolve().parent
-DATA_DIR = PROJECT_ROOT / "data"
-CHROMA_PERSIST_DIR = PROJECT_ROOT / "chroma_db"
+# Paths — default to current working directory (works when installed from PyPI)
+PROJECT_ROOT = Path.cwd()
+DATA_DIR = Path(os.getenv("RAGKIT_DATA_DIR", PROJECT_ROOT / "data"))
+CHROMA_PERSIST_DIR = Path(os.getenv("RAGKIT_CHROMA_DIR", PROJECT_ROOT / "chroma_db"))
 
 # Chunking
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "512"))
@@ -29,5 +32,6 @@ MULTI_QUERY_N = int(os.getenv("MULTI_QUERY_N", "3"))
 GUARDRAILS_ENABLED = os.getenv("GUARDRAILS_ENABLED", "true").lower() == "true"
 MAX_RETRIES = int(os.getenv("MAX_RETRIES", "2"))
 
-# Reranker model (sentence-transformers)
+# Reranker (optional extra: pip install ragkit[rerank])
 RERANKER_MODEL = os.getenv("RERANKER_MODEL", "BAAI/bge-reranker-base")
+RERANK_ENABLED = os.getenv("RERANK_ENABLED", "true").lower() == "true"

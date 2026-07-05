@@ -1,5 +1,5 @@
 """RAG evaluation: faithfulness, relevance; retry & self-correction loop."""
-from config import LLM_MODEL, MAX_RETRIES
+from .config import LLM_MODEL, MAX_RETRIES
 from .providers import LLMProvider, make_llm_provider
 
 

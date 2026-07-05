@@ -2,7 +2,7 @@
 
 This wraps the full RAG pipeline behind a simple interface:
 
-    from backend.client import RAG
+    from ragkit import RAG
 
     rag = RAG(llm_model="gpt-4o-mini", embedding_model="text-embedding-3-small")
     rag.ingest(["./docs", "README.md"])
@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
-from config import DATA_DIR, LLM_MODEL, EMBEDDING_MODEL
+from .config import DATA_DIR, LLM_MODEL, EMBEDDING_MODEL
 from .providers import make_llm_provider, make_embedding_provider
 from .rag_pipeline import ingest as _ingest, query as _query, RAGResponse
 
