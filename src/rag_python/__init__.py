@@ -2,14 +2,24 @@
 
 Quick start::
 
-    from rag_python import RAG
+    pip install rag-python
+    export OPENAI_API_KEY=sk-...
 
-    rag = RAG(llm_model="gpt-4o-mini")
+    # CLI
+    rag-python ingest ./docs --reindex
+    rag-python query "What is our leave policy?"
+    rag-python docs quickstart
+
+    # Python
+    from rag_python import RAG
+    rag = RAG()
     rag.ingest(["./docs"], reindex=True)
     print(rag.query("What is our leave policy?").text)
+
+Documentation: https://github.com/RaghavOG/rag-python/tree/main/docs
 """
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 from .client import RAG, RAGAnswer
 from .rag_pipeline import ingest, query, query_stream, RAGResponse, RAGStream

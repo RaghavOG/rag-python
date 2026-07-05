@@ -1,46 +1,113 @@
-## Providers
+# Providers
 
-rag-python separates **LLM provider** (generation, rewriting, guardrails) from **embedding provider** (retrieval).
+rag-python separates **LLM providers** (generation, query rewriting, guardrails, evaluation) from **embedding providers** (vector retrieval).
 
-### LLM providers
+## LLM providers
 
-| Provider | `llm_provider=` | Env |
-|----------|-----------------|-----|
-| OpenAI | `openai` | `OPENAI_API_KEY` |
+| Provider | `llm_provider=` | Install / env |
+|----------|-----------------|---------------|
+| OpenAI | `openai` (default) | `OPENAI_API_KEY` |
 | Azure OpenAI | `azure_openai` | `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY` |
-| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` + `pip install rag-python[anthropic]` |
+| Anthropic (Claude) | `anthropic` | `ANTHROPIC_API_KEY` + `pip install rag-python[anthropic]` |
 | Gemini | `gemini` | `GEMINI_API_KEY` + `pip install rag-python[gemini]` |
-| Ollama | `ollama` | Ollama running locally |
+| Ollama | `ollama` | Ollama running locally; set `--llm-model` |
 
-### Embedding providers
+### Streaming support
 
-| Provider | `embedding_provider=` |
-|----------|----------------------|
-| OpenAI | `openai` |
-| Azure OpenAI | `azure_openai` |
-| Ollama | `ollama` |
-| Local (offline) | `local` — `pip install rag-python[local]` |
+Token streaming (`query_stream`) is supported on OpenAI, Azure OpenAI, Ollama, and Anthropic. Other providers yield the full answer in one chunk.
 
-Anthropic and Gemini are **LLM-only** in this version — pair them with OpenAI or Ollama embeddings.
+---
 
-### Reranking (optional)
+## Embedding providers
+
+| Provider | `embedding_provider=` | Notes |
+|----------|----------------------|-------|
+| OpenAI | `openai` (default) | `OPENAI_API_KEY` |
+| Azure OpenAI | `azure_openai` | Use your embedding deployment name |
+| Ollama | `ollama` | Requires embedding model in Ollama |
+| Local (offline) | `local` | `pip install rag-python[local]` |
+
+Anthropic and Gemini are **LLM-only** — pair them with OpenAI, Ollama, or local embeddings.
+
+---
+
+## Optional features
+
+### Reranking
 
 ```bash
 pip install rag-python[rerank]
 ```
 
-Uses `sentence-transformers` cross-encoder (`BAAI/bge-reranker-base` by default).  
-Without `[rerank]`, retrieval order is used as fallback.
+Uses `sentence-transformers` cross-encoder (`BAAI/bge-reranker-base` by default). Without `[rerank]`, retrieval order is used.
 
-### Examples
+### Hybrid search
+
+```bash
+pip install rag-python[hybrid]
+```
+
+Combines BM25 keyword search with vector similarity via reciprocal rank fusion.
+
+---
+
+## Examples
+
+### OpenAI end-to-end
 
 ```python
-# OpenAI end-to-end
-rag = RAG(llm_provider="openai", embedding_provider="openai")
+from rag_python import RAG
 
-# Claude + OpenAI embeddings
-rag = RAG(llm_provider="anthropic", llm_model="claude-opus-4-6", embedding_provider="openai")
-
-# Fully local embeddings (offline)
-rag = RAG(llm_provider="ollama", embedding_provider="local", embedding_model="all-MiniLM-L6-v2")
+rag = RAG(
+    llm_provider="openai",
+    llm_model="gpt-4o-mini",
+    embedding_provider="openai",
+    embedding_model="text-embedding-3-small",
+)
 ```
+
+### Claude + OpenAI embeddings
+
+```python
+rag = RAG(
+    llm_provider="anthropic",
+    llm_model="claude-opus-4-6",
+    embedding_provider="openai",
+)
+```
+
+### Fully local embeddings
+
+```python
+rag = RAG(
+    llm_provider="ollama",
+    llm_model="llama3.1",
+    embedding_provider="local",
+    embedding_model="all-MiniLM-L6-v2",
+)
+```
+
+### Azure OpenAI
+
+```python
+rag = RAG(
+    llm_provider="azure_openai",
+    llm_model="your-chat-deployment",
+    embedding_provider="azure_openai",
+    embedding_model="your-embedding-deployment",
+    azure_endpoint="https://<resource>.openai.azure.com",
+    azure_api_key="...",
+)
+```
+
+---
+
+## CLI provider flags
+
+```bash
+rag-python query "question" --llm-provider anthropic --llm-model claude-opus-4-6
+rag-python ingest ./data --embedding-provider local
+rag-python query "question" --llm-provider ollama --llm-model llama3.1 --ollama-base-url http://localhost:11434
+```
+
+See [CLI reference](CLI.md) for all flags.

@@ -1,6 +1,16 @@
-## Usage
+# Usage guide
 
-### Python API
+## Install
+
+```bash
+pip install rag-python
+```
+
+Optional extras: see [Configuration](CONFIGURATION.md#environment-variables) and [Providers](PROVIDERS.md).
+
+---
+
+## Basic Python API
 
 ```python
 from rag_python import RAG
@@ -12,20 +22,44 @@ rag = RAG(
     embedding_model="text-embedding-3-small",
 )
 
-rag.ingest(["./data"], reindex=True)
-ans = rag.query("How many days of annual leave?")
-print(ans.text)
-print(ans.sources)      # retrieved chunks
-print(ans.evaluation)   # faithfulness / relevance scores
+# Ingest files or directories
+rag.ingest(["./data", "./policy.pdf"], reindex=True)
+
+# Query
+answer = rag.query("How many days of annual leave?")
+print(answer.text)         # Generated answer
+print(answer.sources)      # Retrieved chunks with scores
+print(answer.evaluation)   # faithfulness / relevance
+print(answer.retried)      # Whether self-correction ran
 ```
 
-### Hybrid retrieval
+---
 
-Install optional BM25 support:
+## Ingest
 
-```bash
-pip install rag-python[hybrid]
+`rag.ingest()` accepts files and folders. Supported extensions:
+
+`.txt` `.md` `.pdf` `.docx` `.csv` `.json` `.html`
+
+```python
+# Multiple paths
+rag.ingest(["./docs", "handbook.pdf", "notes.md"], reindex=True)
+
+# Custom extensions
+rag = RAG(document_extensions=(".txt", ".md", ".csv"))
 ```
+
+Use `reindex=True` to clear the vector store before ingesting.
+
+---
+
+## Retrieval modes
+
+| Mode | `retriever=` | Description |
+|------|--------------|-------------|
+| Multi-query | `multi_query` (default) | Query rewriting + multiple vector searches |
+| Vector | `vector` | Single embedding search |
+| Hybrid | `hybrid` | BM25 + vector fused with RRF (`pip install rag-python[hybrid]`) |
 
 ```python
 from rag_python import RAG, SearchConfig
@@ -33,40 +67,87 @@ from rag_python import RAG, SearchConfig
 rag = RAG(retriever="hybrid")
 rag.ingest(["./data"], reindex=True)
 
-# Optional: restrict retrieval to chunks from a specific file
-ans = rag.query(
-    "annual leave",
-    search=SearchConfig(retriever="hybrid", metadata_filter={"filename": "hr-policy.txt"}),
+answer = rag.query(
+    "annual leave policy",
+    search=SearchConfig(
+        retriever="hybrid",
+        metadata_filter={"filename": "hr-policy.pdf"},
+    ),
 )
 ```
 
-### CLI
+---
 
-```bash
-pip install -e .
-rag-python ingest ./data --reindex
-rag-python query "How many days of annual leave?" -v
-rag-python query "annual leave" --retriever hybrid
-```
+## Streaming
 
-### Streaming
+Stream tokens for responsive UIs:
 
 ```python
-stream = rag.query_stream("annual leave")
+import rag_python
+
+rag_python.configure_logging()
+
+stream = rag.query_stream("How many days of annual leave?")
 for token in stream:
     print(token, end="", flush=True)
-print(stream.result.evaluation)
+
+# After iteration — full result with sources and evaluation
+result = stream.result
+print(result.sources)
 ```
+
+CLI: `rag-python query "annual leave" --stream`
+
+---
+
+## Multi-provider setups
+
+See [Providers](PROVIDERS.md) for full details.
+
+```python
+# Claude + OpenAI embeddings
+rag = RAG(
+    llm_provider="anthropic",
+    llm_model="claude-opus-4-6",
+    embedding_provider="openai",
+)
+
+# Offline embeddings
+rag = RAG(
+    embedding_provider="local",
+    embedding_model="all-MiniLM-L6-v2",
+)
+```
+
+---
+
+## Low-level API
+
+For advanced use without the `RAG` client:
+
+```python
+from rag_python import ingest, query, query_stream
+
+ingest(data_path="./data", reindex=True)
+response = query("What is the leave policy?")
+```
+
+---
+
+## CLI
+
+See the full [CLI reference](CLI.md).
 
 ```bash
-rag-python query "annual leave" --stream
+rag-python ingest ./data --reindex
+rag-python query "How many days of annual leave?" -v
+rag-python docs quickstart
 ```
 
-### Local development
+---
 
-```bash
-pip install -e ".[dev,rerank,hybrid]"
-pytest
-python main.py ingest --reindex
-python main.py chat
-```
+## Next steps
+
+- [Configuration](CONFIGURATION.md) — env vars and `RAGConfig`
+- [CLI reference](CLI.md) — all terminal flags
+- [Providers](PROVIDERS.md) — LLM and embedding backends

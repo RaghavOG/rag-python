@@ -4,25 +4,31 @@
 [![PyPI downloads](https://img.shields.io/pypi/dm/rag-python.svg)](https://pypi.org/project/rag-python/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub](https://img.shields.io/badge/GitHub-RaghavOG%2Frag--python-blue)](https://github.com/RaghavOG/rag-python)
+[![Documentation](https://img.shields.io/badge/docs-GitHub-blue)](https://github.com/RaghavOG/rag-python/tree/main/docs)
 
-**rag-python** is a production-oriented Python library for **Retrieval-Augmented Generation (RAG)**.
+**Production-grade Retrieval-Augmented Generation (RAG) for Python** — ingest documents, ask questions, get grounded answers with multi-LLM support, hybrid search, streaming, and guardrails.
 
-Ingest your documents, ask questions, get grounded answers — with query rewriting, multi-query retrieval, reranking, guardrails, and multi-LLM support.
+```bash
+pip install rag-python
+export OPENAI_API_KEY=sk-...
+rag-python ingest ./docs --reindex
+rag-python query "What is our leave policy?"
+```
 
-**Author:** [Raghav Singla](https://github.com/RaghavOG)  
-**Repository:** [github.com/RaghavOG/rag-python](https://github.com/RaghavOG/rag-python)
+**Author:** [Raghav Singla](https://github.com/RaghavOG) · **Repo:** [github.com/RaghavOG/rag-python](https://github.com/RaghavOG/rag-python)
 
 ---
 
-## Features
+## Why rag-python?
 
-- Document pipeline: loaders → cleaning → chunking → embeddings → ChromaDB
-- Query pipeline: rewriting → multi-query / **hybrid** retrieval → reranking → **streaming**
-- Generation with guardrails (prompt injection + hallucination checks)
-- Evaluation scores + self-correction retry loop
-- **LLM providers:** OpenAI, Azure OpenAI, Anthropic, Gemini, Ollama
-- **Loaders:** TXT, MD, PDF, DOCX, CSV, JSON, HTML
+| Capability | What you get |
+|------------|--------------|
+| **Ingest** | TXT, MD, PDF, DOCX, CSV, JSON, HTML → chunk → embed → ChromaDB |
+| **Retrieve** | Multi-query rewriting, **hybrid BM25+vector**, reranking, metadata filters |
+| **Generate** | Multi-LLM answers with guardrails, evaluation, and retry loop |
+| **Stream** | `rag.query_stream()` and `--stream` CLI for responsive UX |
+| **Offline** | Local embeddings via sentence-transformers |
+| **CLI** | `rag-python ingest`, `query`, `docs` — no code required |
 
 ---
 
@@ -30,111 +36,114 @@ Ingest your documents, ask questions, get grounded answers — with query rewrit
 
 ```bash
 pip install rag-python
-# or from source
-pip install -e .
-# with reranking + extra providers
-pip install -e ".[rerank,local,hybrid,anthropic,gemini,all]"
 ```
+
+| Extra | Install | Enables |
+|-------|---------|---------|
+| `local` | `pip install rag-python[local]` | Offline embeddings (sentence-transformers) |
+| `hybrid` | `pip install rag-python[hybrid]` | BM25 + vector hybrid retrieval |
+| `rerank` | `pip install rag-python[rerank]` | Cross-encoder reranking |
+| `anthropic` | `pip install rag-python[anthropic]` | Claude LLM |
+| `gemini` | `pip install rag-python[gemini]` | Gemini LLM |
+| `all` | `pip install rag-python[all]` | All optional features |
 
 ---
 
-## Quickstart
+## Quickstart (Python)
 
 ```python
 from rag_python import RAG
 
-rag = RAG(
-    llm_provider="openai",
-    llm_model="gpt-4o-mini",
-    embedding_provider="openai",
-    embedding_model="text-embedding-3-small",
-)
-
+rag = RAG(llm_model="gpt-4o-mini")
 rag.ingest(["./data"], reindex=True)
+
 answer = rag.query("How many days of annual leave?")
 print(answer.text)
+print(answer.sources)
 ```
 
-### Streaming answers
+### Streaming
 
 ```python
-import rag_python
-
-rag_python.configure_logging()  # optional: enable INFO logs
-
 stream = rag.query_stream("How many days of annual leave?")
 for token in stream:
     print(token, end="", flush=True)
-print()
-print(stream.result.sources)  # available after stream ends
+print(stream.result.evaluation)
 ```
 
 ### Hybrid search + metadata filter
 
 ```python
-from rag_python import RAG, SearchConfig
-
 rag = RAG(
     retriever="hybrid",  # pip install rag-python[hybrid]
     metadata_filter={"filename": "leave-policy.pdf"},
 )
-rag.ingest(["./policies/leave-policy.pdf", "./policies/handbook.pdf"])
-answer = rag.query("How many days of annual leave?")
+rag.ingest(["./policies/"])
+print(rag.query("annual leave policy").text)
 ```
 
-### CLI
+---
+
+## Quickstart (CLI)
 
 ```bash
 export OPENAI_API_KEY=sk-...
+
 rag-python ingest ./data --reindex
-rag-python query "How many days of annual leave?" -v
-rag-python query "leave policy" --retriever hybrid --metadata-filter '{"filename": "leave-policy.pdf"}'
-rag-python query "annual leave" --stream
+rag-python query "How many days of annual leave?"
+rag-python query "PTO policy" --stream -v
+rag-python query "benefits" --retriever hybrid
+
+# Built-in terminal docs
+rag-python docs quickstart
+rag-python docs --list
+rag-python --help
 ```
+
+---
+
+## Documentation
+
+| Guide | Description |
+|-------|-------------|
+| [**Docs index**](docs/README.md) | Start here |
+| [Usage](docs/USAGE.md) | Python API, streaming, retrieval |
+| [CLI reference](docs/CLI.md) | All `rag-python` commands and flags |
+| [Configuration](docs/CONFIGURATION.md) | Env vars and `RAGConfig` |
+| [Providers](docs/PROVIDERS.md) | OpenAI, Azure, Anthropic, Gemini, Ollama, local |
+| [Changelog](CHANGELOG.md) | Release notes |
+
+**In the terminal:** `rag-python docs [topic]` — topics: `quickstart`, `install`, `cli`, `config`, `providers`, `features`
 
 ---
 
 ## Environment variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `OPENAI_API_KEY` | For OpenAI | Default LLM + embeddings |
-| `ANTHROPIC_API_KEY` | For Claude | LLM only |
-| `GEMINI_API_KEY` | For Gemini | LLM only |
-| `AZURE_OPENAI_ENDPOINT` | For Azure | Azure OpenAI |
-| `AZURE_OPENAI_API_KEY` | For Azure | Azure OpenAI |
-| `OPENAI_API_VERSION` | Azure | Default `2023-09-01-preview` |
-| `OLLAMA_BASE_URL` | Ollama | Default `http://localhost:11434` |
-| `RAG_PYTHON_DATA_DIR` | Optional | Default `./data` |
-| `RAG_PYTHON_CHROMA_DIR` | Optional | Default `./chroma_db` |
+| Variable | Description |
+|----------|-------------|
+| `OPENAI_API_KEY` | Default LLM + embeddings |
+| `ANTHROPIC_API_KEY` | Claude |
+| `GEMINI_API_KEY` | Gemini |
+| `AZURE_OPENAI_ENDPOINT` / `AZURE_OPENAI_API_KEY` | Azure OpenAI |
+| `OLLAMA_BASE_URL` | Local Ollama (default `http://localhost:11434`) |
+| `RAG_PYTHON_DATA_DIR` | Document dir (default `./data`) |
+| `RAG_PYTHON_CHROMA_DIR` | Vector store (default `./chroma_db`) |
 
-See [`.env.example`](.env.example) for all tuning options.
+See [Configuration](docs/CONFIGURATION.md) and [`.env.example`](.env.example).
 
 ---
 
-## Project structure
+## Project layout
 
 ```text
-.
-├── src/rag_python/      # Installable package (PyPI: rag-python)
-│   ├── client.py        # High-level RAG API
-│   ├── rag_pipeline.py  # Full pipeline
-│   └── providers/       # OpenAI, Azure, Anthropic, Gemini, Ollama
-├── tests/
-├── examples/
-├── docs/
-├── data/                # Sample documents
-├── pyproject.toml
-└── main.py              # Local dev CLI wrapper
+src/rag_python/     # pip install rag-python → import rag_python
+  client.py         # RAG, RAGAnswer, query_stream
+  rag_pipeline.py   # ingest / query pipeline
+  providers/        # OpenAI, Azure, Anthropic, Gemini, Ollama, local
+docs/               # User documentation (linked from PyPI README)
+tests/
+examples/
 ```
-
----
-
-## Docs
-
-- [Usage](docs/USAGE.md)
-- [Providers](docs/PROVIDERS.md)
-- [Changelog](CHANGELOG.md)
 
 ---
 

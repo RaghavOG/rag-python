@@ -2,6 +2,13 @@
 
 All notable changes to **rag-python** are documented here.
 
+## [0.3.1] - 2026-07-05
+
+### Added
+- `rag-python docs` — built-in terminal documentation (`quickstart`, `cli`, `config`, `providers`, …)
+- Full docs site: `docs/README.md`, `USAGE.md`, `CLI.md`, `CONFIGURATION.md`, `PROVIDERS.md`
+- PyPI README overhaul with install extras table and documentation links
+
 ## [0.3.0] - 2026-07-05
 
 ### Added
@@ -12,6 +19,7 @@ All notable changes to **rag-python** are documented here.
 - **`rag.query_stream()`** — stream answer tokens for responsive UX
 - Structured **logging** via `rag_python.get_logger()` / `configure_logging()`
 - Pipeline logging for ingest, retrieval, guardrails, and evaluation
+- **Documentation:** `rag-python docs` terminal guide, `docs/` folder, PyPI README overhaul
 
 ### Changed
 - Default supported ingest extensions include `.csv`, `.json`, `.html`
@@ -45,6 +53,7 @@ All notable changes to **rag-python** are documented here.
 - Data/chroma paths default to cwd (`RAG_PYTHON_DATA_DIR`, `RAG_PYTHON_CHROMA_DIR`)
 - Reranking moved to optional dependency (`pip install rag-python[rerank]`)
 
+[0.3.1]: https://github.com/RaghavOG/rag-python/releases/tag/v0.3.1
 [0.3.0]: https://github.com/RaghavOG/rag-python/releases/tag/v0.3.0
 [0.2.0]: https://github.com/RaghavOG/rag-python/releases/tag/v0.2.0
 [0.1.0]: https://github.com/RaghavOG/rag-python/releases/tag/v0.1.0
