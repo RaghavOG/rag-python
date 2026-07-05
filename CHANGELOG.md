@@ -2,6 +2,20 @@
 
 All notable changes to **rag-python** are documented here.
 
+## [0.2.0] - 2026-07-05
+
+### Added
+- **Local embeddings** provider (`embedding_provider="local"`) via sentence-transformers — `pip install rag-python[local]`
+- Unit tests for chunking, document loaders, and mocked pipeline
+- CLI `--version` flag
+- PyPI badges on README
+
+### Fixed
+- CLI `--no-multi-query` now correctly switches retriever to `vector` mode
+
+### Changed
+- Removed legacy `backend/`, `ragkit/`, `minirag/` directories from workspace
+
 ## [0.1.0] - 2026-07-05
 
 ### Added
@@ -17,4 +31,5 @@ All notable changes to **rag-python** are documented here.
 - Data/chroma paths default to cwd (`RAG_PYTHON_DATA_DIR`, `RAG_PYTHON_CHROMA_DIR`)
 - Reranking moved to optional dependency (`pip install rag-python[rerank]`)
 
+[0.2.0]: https://github.com/RaghavOG/rag-python/releases/tag/v0.2.0
 [0.1.0]: https://github.com/RaghavOG/rag-python/releases/tag/v0.1.0

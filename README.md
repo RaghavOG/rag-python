@@ -1,5 +1,7 @@
 # rag-python
 
+[![PyPI version](https://img.shields.io/pypi/v/rag-python.svg)](https://pypi.org/project/rag-python/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/rag-python.svg)](https://pypi.org/project/rag-python/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-RaghavOG%2Frag--python-blue)](https://github.com/RaghavOG/rag-python)
@@ -30,7 +32,7 @@ pip install rag-python
 # or from source
 pip install -e .
 # with reranking + extra providers
-pip install -e ".[rerank,anthropic,gemini,all]"
+pip install -e ".[rerank,local,anthropic,gemini,all]"
 ```
 
 ---

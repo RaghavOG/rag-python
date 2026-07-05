@@ -1,6 +1,8 @@
 """rag-python command-line interface."""
 import argparse
+from dataclasses import replace
 
+from . import __version__
 from .client import RAG
 
 
@@ -21,9 +23,17 @@ def _build_rag(args: argparse.Namespace) -> RAG:
 
 
 def _add_provider_args(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("--llm-provider", default="openai", choices=["openai", "azure_openai", "anthropic", "gemini", "ollama"])
+    parser.add_argument(
+        "--llm-provider",
+        default="openai",
+        choices=["openai", "azure_openai", "anthropic", "gemini", "ollama"],
+    )
     parser.add_argument("--llm-model", default=None)
-    parser.add_argument("--embedding-provider", default="openai", choices=["openai", "azure_openai", "ollama"])
+    parser.add_argument(
+        "--embedding-provider",
+        default="openai",
+        choices=["openai", "azure_openai", "ollama", "local"],
+    )
     parser.add_argument("--embedding-model", default=None)
     parser.add_argument("--ollama-base-url", default=None)
     parser.add_argument("--azure-endpoint", default=None)
@@ -39,6 +49,7 @@ def main() -> None:
         prog="rag-python",
         description="rag-python — modular RAG with query rewriting, reranking, guardrails, and multi-LLM support.",
     )
+    parser.add_argument("--version", action="version", version=f"rag-python {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
 
     ing = sub.add_parser("ingest", help="Ingest files/folders into the vector store")
@@ -63,7 +74,11 @@ def main() -> None:
     if args.command == "query":
         rag = _build_rag(args)
         question = " ".join(args.question)
-        ans = rag.query(question, multi_query=not args.no_multi_query)
+        search = replace(
+            rag.config.search,
+            retriever="vector" if args.no_multi_query else "multi_query",
+        )
+        ans = rag.query(question, search=search)
         print(ans.text)
         if args.verbose:
             print("\n--- evaluation ---")

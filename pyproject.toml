@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rag-python"
-version = "0.1.0"
+version = "0.2.0"
 description = "Production-grade RAG for Python: multi-LLM, query rewriting, reranking, guardrails, and evaluation."
 readme = "README.md"
 license = { text = "MIT" }
@@ -38,10 +38,11 @@ dependencies = [
 
 [project.optional-dependencies]
 rerank = ["sentence-transformers>=2.2.0", "torch>=2.0.0"]
+local = ["sentence-transformers>=2.2.0"]
 anthropic = ["anthropic>=0.20.0"]
 gemini = ["google-genai>=0.3.0"]
 dev = ["pytest>=7.0", "ruff>=0.1.0", "build", "twine"]
-all = ["rag-python[rerank,anthropic,gemini]"]
+all = ["rag-python[rerank,local,anthropic,gemini]"]
 
 [project.scripts]
 rag-python = "rag_python.cli:main"

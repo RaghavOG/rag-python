@@ -9,10 +9,11 @@ from .azure_openai_provider import AzureOpenAIProvider
 from .anthropic_provider import AnthropicProvider
 from .gemini_provider import GeminiProvider
 from .ollama_provider import OllamaProvider
+from .local_provider import LocalEmbeddingProvider
 
 
 LLMProviderName = Literal["openai", "azure_openai", "anthropic", "gemini", "ollama"]
-EmbeddingProviderName = Literal["openai", "azure_openai", "ollama"]
+EmbeddingProviderName = Literal["openai", "azure_openai", "ollama", "local"]
 
 
 def make_llm_provider(name: LLMProviderName, **kwargs) -> LLMProvider:
@@ -49,5 +50,7 @@ def make_embedding_provider(name: EmbeddingProviderName, **kwargs) -> EmbeddingP
         )
     if name == "ollama":
         return OllamaProvider(base_url=kwargs.get("base_url") or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"))
+    if name == "local":
+        return LocalEmbeddingProvider(model_name=kwargs.get("model") or os.getenv("LOCAL_EMBEDDING_MODEL"))
     raise ValueError(f"Unknown embedding provider: {name}")
 

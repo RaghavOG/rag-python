@@ -19,6 +19,7 @@ rag-python separates **LLM provider** (generation, rewriting, guardrails) from *
 | OpenAI | `openai` |
 | Azure OpenAI | `azure_openai` |
 | Ollama | `ollama` |
+| Local (offline) | `local` — `pip install rag-python[local]` |
 
 Anthropic and Gemini are **LLM-only** in this version — pair them with OpenAI or Ollama embeddings.
 
@@ -40,6 +41,6 @@ rag = RAG(llm_provider="openai", embedding_provider="openai")
 # Claude + OpenAI embeddings
 rag = RAG(llm_provider="anthropic", llm_model="claude-opus-4-6", embedding_provider="openai")
 
-# Fully local with Ollama
-rag = RAG(llm_provider="ollama", llm_model="llama3.1", embedding_provider="ollama", embedding_model="mxbai-embed-large")
+# Fully local embeddings (offline)
+rag = RAG(llm_provider="ollama", embedding_provider="local", embedding_model="all-MiniLM-L6-v2")
 ```
